@@ -39,16 +39,20 @@ public class ChatServer  {
 			    ClientThread ct = new ClientThread(clientSocket);
                 ct.start();
 
-                // Update global variables.
-                // !!! How to protect variables integrity ?
-                listCT[nbCT] = ct;
-                nbCT = nbCT +1;
-		         
+		        incrementCT(ct); 
             }
         } catch (Exception e) {
             System.err.println("Error in ChatServer:" + e);
         }
       }
+
+    public static synchronized void incrementCT(ClientThread ct ){
+    
+                // Update global variables.
+                // !!! How to protect variables integrity ?
+                listCT[nbCT] = ct;
+                nbCT = nbCT +1;
+    }
   }
 
   
