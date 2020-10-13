@@ -13,42 +13,45 @@ import java.net.*;
 public class ClientThread extends Thread {
 	
 	private Socket clientSocket;
+    private PrintStream socOut;
 	
     static int nbClients;
 
 	ClientThread(Socket s) {
 		this.clientSocket = s;
+        try {
+            this.socOut = new PrintStream(s.getOutputStream());
+    	} catch (Exception e) {
+        	System.err.println("Error in ChatServer:" + e); 
+        }
 	}
 
  	/**
-  	* receives a request from client then sends an echo to the client
+  	* Receives a message from client and sends it back to everyone
   	* @param clientSocket the client socket
   	**/
 	public void run() {
         try {
             BufferedReader socIn = null;
             socIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));    
-            PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
             while (true) {
-                String line = socIn.readLine();
-                System.out.println(clientSocket.getInetAddress()+": "+line);
-                socOut.println(line);
-                System.out.println("Number of clients : " + ChatServer.nbCT);
-                for (int i=0; i< ChatServer.nbCT; i = i+1){
-                    ChatServer.listCT[i].printHello();
+                String message = socIn.readLine();
+                System.out.println(clientSocket.getInetAddress()+": "+message);
+                //System.out.println("Number of clients : " + ChatServer.nbCT);
+                for (int i=0; i<ChatServer.nbCT; i=i+1) {
+                    ChatServer.listCT[i].send(message);
                 }
             }
     	} catch (Exception e) {
-        	System.err.println("Error in EchoServer:" + e); 
+        	System.err.println("Error in ChatServer:" + e); 
         }
     }
     
-    public void printHello() {
+    public void send(String message) {
         try {
-            //PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
-            //socOut.println("hello");
+            this.socOut.println(message);
         } catch (Exception e) {
-            System.err.println("Error in EchoServer:" + e); 
+            System.err.println("Error in ChatServer:" + e); 
         }
     }
 
