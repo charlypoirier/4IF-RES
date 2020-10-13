@@ -1,6 +1,6 @@
 /***
- * ChatClient
- * TCP Client for a socket-based chat system
+ * ChatClient.java
+ * TCP client for a socket-based chat system
  * Date: 13/10/2020
  * Authors: Jérôme Hue, Charly Poirier
  */

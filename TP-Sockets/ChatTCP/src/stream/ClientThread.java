@@ -1,8 +1,8 @@
 /***
- * ClientThread
- * Example of a TCP server
- * Date: 14/12/08
- * Authors:
+ * ClientThread.java
+ * Thread to handle clients
+ * Date: 13/10/2020
+ * Authors: Jérôme Hue, Charly Poirier
  */
 
 package stream;

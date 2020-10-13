@@ -1,8 +1,8 @@
 /***
- * ChatServer
- * Example of a TCP server
- * Date: 10/01/04
- * Authors:
+ * ChatServer.java
+ * TCP server for a socket-based chat system
+ * Date: 13/10/2020
+ * Authors: Jérôme Hue, Charly Poirier
  */
 
 package stream;
@@ -11,16 +11,15 @@ import java.io.*;
 import java.net.*;
 
 public class ChatServer  {
+
+    static ClientThread[] listCT = new ClientThread[100];
+    static int nbCT = 0;
   
  	/**
   	* main method
 	* @param ChatServer port
   	* 
   	**/
-
-    static ClientThread[] listCT = new ClientThread[100];
-    static int nbCT = 0;
-
     public static void main(String args[]){ 
         ServerSocket listenSocket;
         
@@ -44,15 +43,14 @@ public class ChatServer  {
         } catch (Exception e) {
             System.err.println("Error in ChatServer:" + e);
         }
-      }
+    }
 
     public static synchronized void incrementCT(ClientThread ct ){
-    
-                // Update global variables.
-                // !!! How to protect variables integrity ?
-                listCT[nbCT] = ct;
-                nbCT = nbCT +1;
+        // Update global variables.
+        // !!! How to protect variables integrity ?
+        listCT[nbCT] = ct;
+        nbCT = nbCT +1;
     }
-  }
+}
 
   

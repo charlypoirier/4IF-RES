@@ -1,8 +1,8 @@
 /***
- * MessageListener
- * Example of a TCP server
- * Date: 14/12/08
- * Authors:
+ * MessageListener.java
+ * Thread to handle incoming messages
+ * Date: 13/10/2020
+ * Authors: Jérôme Hue, Charly Poirier
  */
 
 package stream;
@@ -14,7 +14,7 @@ public class MessageListener extends Thread {
 	
 	private BufferedReader input;
 
-	MessageListener(BufferedReader input) {
+    MessageListener(BufferedReader input) {
 		this.input = input;
 	}
 
@@ -26,10 +26,10 @@ public class MessageListener extends Thread {
                     System.out.println("> " + message);
                 } else break;
             }
-            System.out.println("[Disconnected]");
-            System.exit(1);
     	} catch (Exception e) {
         	System.err.println("Error in MessageListener:" + e); 
         }
+        System.out.println("[Disconnected]");
+        System.exit(1);
     }
 }

@@ -13,4 +13,4 @@ client:
 clean:
 	rm -rf classes/*
 
-.PHONY: all clean
+.PHONY: all server client clean
