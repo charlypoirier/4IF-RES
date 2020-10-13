@@ -36,6 +36,7 @@ public class ClientThread extends Thread {
             socIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));    
             while (true) {
                 String message = socIn.readLine();
+                if (message == null) {  break; }
                 System.out.println(clientSocket.getInetAddress()+": "+message);
                 //System.out.println("Number of clients : " + ChatServer.nbCT);
                 for (int i=0; i<ChatServer.nbCT; i=i+1) {

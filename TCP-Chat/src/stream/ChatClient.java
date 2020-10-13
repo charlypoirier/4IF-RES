@@ -56,7 +56,6 @@ public class ChatClient {
             if (message.equals(".")) break;
         	socOut.println(message);
         }
-
         socOut.close();
         socIn.close();
         stdIn.close();
