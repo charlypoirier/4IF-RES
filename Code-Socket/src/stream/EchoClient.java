@@ -33,10 +33,10 @@ public class EchoClient {
         try {
       	    // creation socket ==> connexion
       	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());
-	    socIn = new BufferedReader(
-	    		          new InputStreamReader(echoSocket.getInputStream()));    
-	    socOut= new PrintStream(echoSocket.getOutputStream());
-	    stdIn = new BufferedReader(new InputStreamReader(System.in));
+            socIn = new BufferedReader(
+                            new InputStreamReader(echoSocket.getInputStream()));    
+            socOut= new PrintStream(echoSocket.getOutputStream());
+            stdIn = new BufferedReader(new InputStreamReader(System.in));
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host:" + args[0]);
             System.exit(1);
