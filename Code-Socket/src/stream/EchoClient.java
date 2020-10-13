@@ -14,10 +14,10 @@ import java.net.*;
 public class EchoClient {
 
  
-  /**
-  *  main method
-  *  accepts a connection, receives a message from client then sends an echo to the client
-  **/
+    /**
+    *  main method
+    *  accepts a connection, receives a message from client then sends an echo to the client
+    **/
     public static void main(String[] args) throws IOException {
 
         Socket echoSocket = null;
@@ -26,8 +26,8 @@ public class EchoClient {
         BufferedReader socIn = null;
 
         if (args.length != 2) {
-          System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
-          System.exit(1);
+            System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
+            System.exit(1);
         }
 
         try {
@@ -53,10 +53,10 @@ public class EchoClient {
         	socOut.println(line);
         	System.out.println("echo: " + socIn.readLine());
         }
-      socOut.close();
-      socIn.close();
-      stdIn.close();
-      echoSocket.close();
+        socOut.close();
+        socIn.close();
+        stdIn.close();
+        echoSocket.close();
     }
 }
 
