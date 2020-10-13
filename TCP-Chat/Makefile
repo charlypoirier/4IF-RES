@@ -1,13 +1,10 @@
 sources = $(wildcard src/stream/*.java)
 classes = $(sources:.java=.class)
 
-all: program
-program: $(classes)
-
-%.class: %.java
-	javac -d classes/ $<
+all: 
+	javac -d classes/ $(sources)
 
 clean:
 	rm -f  *.class
 
-.PHONY: all program clean
+.PHONY: all clean
