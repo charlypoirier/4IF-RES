@@ -1,5 +1,5 @@
 /***
- * EchoServer
+ * ChatServer
  * Example of a TCP server
  * Date: 10/01/04
  * Authors:
@@ -10,11 +10,11 @@ package stream;
 import java.io.*;
 import java.net.*;
 
-public class EchoServerMultiThreaded  {
+public class ChatServer  {
   
  	/**
   	* main method
-	* @param EchoServer port
+	* @param ChatServer port
   	* 
   	**/
 
@@ -27,7 +27,7 @@ public class EchoServerMultiThreaded  {
         nbCT  = 0;
 
   	    if (args.length != 1) {
-            System.out.println("Usage: java EchoServer <EchoServer port>");
+            System.out.println("Usage: java ChatServer <ChatServer port>");
             System.exit(1);
   	    }
 	    try {
@@ -46,7 +46,7 @@ public class EchoServerMultiThreaded  {
 		         
             }
         } catch (Exception e) {
-            System.err.println("Error in EchoServer:" + e);
+            System.err.println("Error in ChatServer:" + e);
         }
       }
   }

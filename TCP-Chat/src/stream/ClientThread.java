@@ -10,13 +10,11 @@ package stream;
 import java.io.*;
 import java.net.*;
 
-public class ClientThread
-	extends Thread {
+public class ClientThread extends Thread {
 	
 	private Socket clientSocket;
 	
     static int nbClients;
-
 
 	ClientThread(Socket s) {
 		this.clientSocket = s;
@@ -35,9 +33,9 @@ public class ClientThread
                 String line = socIn.readLine();
                 System.out.println(clientSocket.getInetAddress()+": "+line);
                 socOut.println(line);
-                System.out.println("Number of clients : " + EchoServerMultiThreaded.nbCT);
-                for (int i=0; i< EchoServerMultiThreaded.nbCT; i = i+1){
-                    EchoServerMultiThreaded.listCT[i].printHello();
+                System.out.println("Number of clients : " + ChatServer.nbCT);
+                for (int i=0; i< ChatServer.nbCT; i = i+1){
+                    ChatServer.listCT[i].printHello();
                 }
             }
     	} catch (Exception e) {
