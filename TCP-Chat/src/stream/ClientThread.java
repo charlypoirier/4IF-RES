@@ -1,7 +1,8 @@
 /***
  * ClientThread
- * Date: 13/10/2020
- * Authors: Jérôme Hue, Charly Poirier
+ * Example of a TCP server
+ * Date: 14/12/08
+ * Authors:
  */
 
 package stream;
