@@ -15,6 +15,8 @@ public class ClientThread
 	
 	private Socket clientSocket;
 	
+    static int nbClients;
+
 	ClientThread(Socket s) {
 		this.clientSocket = s;
 	}
@@ -32,6 +34,7 @@ public class ClientThread
                 String line = socIn.readLine();
                 System.out.println(clientSocket.getInetAddress()+": "+line);
                 socOut.println(line);
+                System.out.println("Number of clients : " +nbClients);
             }
     	} catch (Exception e) {
         	System.err.println("Error in EchoServer:" + e); 
