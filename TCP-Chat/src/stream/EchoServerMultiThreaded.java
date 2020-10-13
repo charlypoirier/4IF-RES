@@ -17,10 +17,14 @@ public class EchoServerMultiThreaded  {
 	* @param EchoServer port
   	* 
   	**/
+
+    static ClientThread[] listCT = new ClientThread[100];
+    static int nbCT = 0;
+
     public static void main(String args[]){ 
         ServerSocket listenSocket;
         
-        ClientThread.nbClients = 0;
+        nbCT  = 0;
 
   	    if (args.length != 1) {
             System.out.println("Usage: java EchoServer <EchoServer port>");
@@ -33,9 +37,14 @@ public class EchoServerMultiThreaded  {
 			    Socket clientSocket = listenSocket.accept();
 			    System.out.println("Connexion from:" + clientSocket.getInetAddress());
 			    ClientThread ct = new ClientThread(clientSocket);
-			    ClientThread.nbClients = ClientThread.nbClients + 1;
                 ct.start();
-		    }
+
+                // Update global variables.
+                // !!! How to protect variables integrity ?
+                listCT[nbCT] = ct;
+                nbCT = nbCT +1;
+		         
+            }
         } catch (Exception e) {
             System.err.println("Error in EchoServer:" + e);
         }

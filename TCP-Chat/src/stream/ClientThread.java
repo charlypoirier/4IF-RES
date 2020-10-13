@@ -17,6 +17,7 @@ public class ClientThread
 	
     static int nbClients;
 
+
 	ClientThread(Socket s) {
 		this.clientSocket = s;
 	}
@@ -34,10 +35,23 @@ public class ClientThread
                 String line = socIn.readLine();
                 System.out.println(clientSocket.getInetAddress()+": "+line);
                 socOut.println(line);
-                System.out.println("Number of clients : " +nbClients);
+                System.out.println("Number of clients : " + EchoServerMultiThreaded.nbCT);
+                for (int i=0; i< EchoServerMultiThreaded.nbCT; i = i+1){
+                    EchoServerMultiThreaded.listCT[i].printHello();
+                }
             }
     	} catch (Exception e) {
         	System.err.println("Error in EchoServer:" + e); 
         }
     }
+    
+    public void printHello() {
+        try {
+            //PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
+            //socOut.println("hello");
+        } catch (Exception e) {
+            System.err.println("Error in EchoServer:" + e); 
+        }
+    }
+
 }
