@@ -4,13 +4,10 @@ classes = $(sources:.java=.class)
 all:
 	javac -d classes/ $(sources)
 
-server:
-	@cd classes/; java stream.ChatServer 5555
-
-client:
-	@cd classes/; java stream.ChatClient 127.0.0.1 5555
+user:
+	@cd classes/; java GroupChat 230.0.0.0 5000
 
 clean:
 	rm -rf classes/*
 
-.PHONY: all server client clean
+.PHONY: all user clean
