@@ -24,6 +24,7 @@ public class ClientThread extends Thread {
     	} catch (Exception e) {
         	System.err.println("Error in ChatServer:" + e); 
         }
+
 	}
 
  	/**
@@ -31,14 +32,37 @@ public class ClientThread extends Thread {
   	* @param clientSocket the client socket
   	**/
 	public void run() {
+        
+        // Display message history
+        if (ChatServer.history.size() > 0) {
+            for (int i = 0; i< ChatServer.history.size() ; i = i+1) {
+                ChatServer.listCT[ChatServer.nbCT - 1].send(ChatServer.history.get(i));
+            }
+        }
+        
+        
         try {
             BufferedReader socIn = null;
             socIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));    
             while (true) {
                 String message = socIn.readLine();
                 if (message == null) {  break; }
+                
+                // Display message on server
                 System.out.println(clientSocket.getInetAddress()+": "+message);
-                //System.out.println("Number of clients : " + ChatServer.nbCT);
+                
+                // Store message in history
+                ChatServer.history.add(message);
+             
+                // Store message in file
+                FileWriter fwriter = new FileWriter("history.txt", true);
+                fwriter.write(message + "\n");
+                fwriter.close();
+
+
+                System.out.println("Messages in chat history : "+ ChatServer.history.size());
+
+                // Send message to everyone 
                 for (int i=0; i<ChatServer.nbCT; i=i+1) {
                     ChatServer.listCT[i].send(message);
                 }

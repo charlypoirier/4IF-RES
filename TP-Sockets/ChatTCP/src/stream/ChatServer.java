@@ -9,12 +9,15 @@ package stream;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
+
 
 public class ChatServer  {
 
     static ClientThread[] listCT = new ClientThread[100];
     static int nbCT = 0;
-  
+    static ArrayList<String> history = new ArrayList<String>();
+
  	/**
   	* main method
 	* @param ChatServer port
@@ -22,9 +25,6 @@ public class ChatServer  {
   	**/
     public static void main(String args[]){ 
         ServerSocket listenSocket;
-        
-        nbCT  = 0;
-
   	    if (args.length != 1) {
             System.out.println("Usage: java ChatServer <ChatServer port>");
             System.exit(1);
@@ -47,7 +47,6 @@ public class ChatServer  {
 
     public static synchronized void incrementCT(ClientThread ct ){
         // Update global variables.
-        // !!! How to protect variables integrity ?
         listCT[nbCT] = ct;
         nbCT = nbCT +1;
     }
