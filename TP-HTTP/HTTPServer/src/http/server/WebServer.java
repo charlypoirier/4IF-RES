@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -53,22 +55,32 @@ public class WebServer {
         // stop reading once a blank line is hit. This
         // blank line signals the end of the client HTTP
         // headers.
-        String str = ".";
-        String method = "";
+
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        // First header line
+        String str = in.readLine();
+        if (str == null || str.equals("")) return;
         
-        str = in.readLine();
-        if (str != null && !str.equals("")) {
-            String[] args = str.split("\\s");
-            if (args.length > 0) method = args[0];
-            if (!method.equals("GET")) return;
-        }
+        String[] args = str.split("\\s");
+        if (args.length >= 2) {
+            parameters.put("method", args[0]);
+            parameters.put("resource", args[1]);
+            parameters.put("version", args[2]);
+        } else return;
+
+        // Check request (only handle GET requests for now)
+        if (!parameters.get("method").equals("GET")) return;
         
-        String resource = "index.html";
+        // Parse header parameters
         while (str != null && !str.equals("")) {
-            System.out.println(str);
             str = in.readLine();
+            args = str.split(": ");
+            if (args.length > 1) {
+                parameters.put(args[0], args[1]);
+            }
         }
-          
+        
         // Send the response
         // Send the headers
         out.println("HTTP/1.0 200 OK");
@@ -81,7 +93,7 @@ public class WebServer {
         // Send the HTML page
         BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader("../doc/"+resource));
+			reader = new BufferedReader(new FileReader("../doc" + parameters.get("resource")));
 			String line = reader.readLine();
 			while (line != null) {
                 out.println(line);
@@ -92,7 +104,6 @@ public class WebServer {
 			e.printStackTrace();
 		}
 
-        //out.println("<H1>Welcome to the Ultra Mini-WebServer</H2>");
         out.flush();
 
         remote.close();
