@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
@@ -46,16 +47,11 @@ public class WebServer {
         // wait for a connection
         Socket remote = s.accept();
         // remote is now the connected socket
-        System.out.println("Connection, sending data.");
         BufferedReader in = new BufferedReader(new InputStreamReader(
             remote.getInputStream()));
         PrintWriter out = new PrintWriter(remote.getOutputStream());
 
-        // read the data sent. We basically ignore it,
-        // stop reading once a blank line is hit. This
-        // blank line signals the end of the client HTTP
-        // headers.
-
+        // Parse data from the header
         Map<String, String> parameters = new HashMap<String, String>();
 
         // First header line
@@ -81,27 +77,38 @@ public class WebServer {
             }
         }
         
-        // Send the response
-        // Send the headers
-        out.println("HTTP/1.0 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        
-        // this blank line signals the end of the headers
-        out.println("");
-        
-        // Send the HTML page
+        // Send the requested resource
         BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader("../doc" + parameters.get("resource")));
+            reader = new BufferedReader(new FileReader("../doc" + parameters.get("resource")));
+                
+            // Send the headers
+            out.println("HTTP/1.0 200 OK");
+            out.println("Content-Type: text/html"); // TODO: Verify content-type (image/png, ...)
+            out.println("Server: Bot");
+            out.println("");
+
+            // Send the file
 			String line = reader.readLine();
 			while (line != null) {
                 out.println(line);
 				line = reader.readLine();
 			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+            reader.close();
+
+		} catch (FileNotFoundException e) {
+            out.println("HTTP/1.0 404 Not Found");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            out.println("");
+            out.println("<p>Not found (404)</p>");
+        } catch (IOException e) {
+            e.printStackTrace();
+            out.println("HTTP/1.0 500 Internal Server Error");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            out.println("");
+            out.println("<p>Internal Server Error (500)</p>");
 		}
 
         out.flush();
