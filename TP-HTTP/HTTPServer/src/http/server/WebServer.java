@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.File;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -56,17 +57,19 @@ public class WebServer {
         String str = "."; 
         while (str != null && !str.equals("")) {
             //System.out.println(str);
-            String[] stringValidTokens = str.split(" ");
-            if (stringValidTokens[0].equals("GET") ) {
+            String[] Tokens = str.split(" ");
+            if (Tokens[0].equals("GET") ) {
                 // System.out.println("stringValidTokens : " + stringValidTokens[0]);
-                GETHandler();
+                GETHandler(Tokens[1], out);
             }
             //System.out.println("stringValidTokens : " + stringValidTokens[0]);
             str = in.readLine();
         }
-          
+         
+       /* 
         // Send the response
-        // SeString[] stringValidTokens = line.split(":");nd the headers
+        
+        // Send the headers
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
@@ -90,7 +93,7 @@ public class WebServer {
 
         //out.println("<H1>Welcome to the Ultra Mini-WebServer</H2>");
         out.flush();
-
+        */
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);
@@ -99,13 +102,80 @@ public class WebServer {
   }
 
     
-    public void GETHandler() {
+    public void GETHandler(String ressource, PrintWriter out) {
         
-        System.out.println("Handling a GET Method");
+        // Displaying requested ressources
+        System.out.println("GET " +ressource);
+       
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        // this blank line signals the end of the headers
+        out.println("");
+
+        // Send the html page requested
+        BufferedReader reader;
+		try {
+            if (!ressource.equals("/")) {
+			reader = new BufferedReader(new FileReader("../doc" + ressource));
+            } else {
+            
+			reader = new BufferedReader(new FileReader("../doc/index.html"));
+            }
+            
+            String line = reader.readLine();
+			while (line != null) {
+                out.println(line);
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+        out.flush();
+        
+    }
+    
+    public void POSTHandler(String ressource, PrintWriter out) {
+        System.out.println("POST " +ressource);
+
+        //POST is used to send data to a server to create/update a resource.
+        //The data sent to the server with POST is stored in the request body of the HTTP request:
+    
+        File rFile = new File("../doc" + ressource);
+        boolean exist = rFile.exists();
+
+        // FileOutputStream(File file, boolean append)
+        FileOutputStream fos = new FileOutputStream(rFile, exist);
+
+        
+    
+
     }
 
-    public void HEADHandler() {
+    public void HEADHandler(String ressource, PrintWriter out) {
         System.out.println("Handling a HEAD Method");
+		try {
+			// Vérification de l'existence de la ressource demandée
+			File rFile = new File("../doc" + ressource);
+			if(rFile.exists() && rFile.isFile()) {
+				
+                  
+            // Sending header 
+            out.println("HTTP/1.0 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            out.println("");
+            
+			
+            } else {}
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
 
     public void PUTHandler() {
@@ -116,9 +186,6 @@ public class WebServer {
         System.out.println("Handling a DELETE Method");
     }
     
-    public void POSTHandler() {
-        System.out.println("Handling a POST Method");
-    }
     /**
     * Start the application.
     * 
