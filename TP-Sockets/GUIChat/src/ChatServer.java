@@ -48,6 +48,9 @@ public class ChatServer  {
         al  = new ArrayList<ClientThread>();
         // ArrayList for the messages list
         ml = new ArrayList<String>();
+        // Keep going
+        this.keepGoing = true;
+        
     }
 
     // Start the server
@@ -57,14 +60,16 @@ public class ChatServer  {
             ServerSocket serverSocket = new ServerSocket(port);
             
             // Display message saying that we are waiting
-            display("Server ready on port : "+ port + ".");
+            display("Server ready on port : "+ port + "." +keepGoing);
             
-            while(true) {
+            while(keepGoing) {
                 
                 // Server waits for a connection
                 Socket socket  = serverSocket.accept();
 
-                if(!keepGoing) { break; }
+                if (!keepGoing) {
+                    break; 
+            }
 
                 // Spawn a thread for new client
                 ClientThread t = new ClientThread(socket);
