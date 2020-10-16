@@ -55,13 +55,16 @@ public class ChatServer  {
         try {
             // Create a server socket associated with the server port
             ServerSocket serverSocket = new ServerSocket(port);
-                
+            
+            // Display message saying that we are waiting
+            display("Server ready on port : "+ port + ".");
+            
             while(true) {
-                // Display message saying that we are waiting
-                display("Server ready on port : "+ port + ".");
                 
                 // Server waits for a connection
                 Socket socket  = serverSocket.accept();
+
+                if(!keepGoing) { break; }
 
                 // Spawn a thread for new client
                 ClientThread t = new ClientThread(socket);
