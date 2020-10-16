@@ -53,24 +53,20 @@ public class WebServer {
         // stop reading once a blank line is hit. This
         // blank line signals the end of the client HTTP
         // headers.
-        String str = ".";
-        String method = "";
-        
-        str = in.readLine();
-        if (str != null && !str.equals("")) {
-            String[] args = str.split("\\s");
-            if (args.length > 0) method = args[0];
-            if (!method.equals("GET")) return;
-        }
-        
-        String resource = "index.html";
+        String str = "."; 
         while (str != null && !str.equals("")) {
-            System.out.println(str);
+            //System.out.println(str);
+            String[] stringValidTokens = str.split(" ");
+            if (stringValidTokens[0].equals("GET") ) {
+                // System.out.println("stringValidTokens : " + stringValidTokens[0]);
+                GETHandler();
+            }
+            //System.out.println("stringValidTokens : " + stringValidTokens[0]);
             str = in.readLine();
         }
           
         // Send the response
-        // Send the headers
+        // SeString[] stringValidTokens = line.split(":");nd the headers
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
@@ -81,7 +77,7 @@ public class WebServer {
         // Send the HTML page
         BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader("../doc/"+resource));
+			reader = new BufferedReader(new FileReader("../doc/index.html"));
 			String line = reader.readLine();
 			while (line != null) {
                 out.println(line);
@@ -102,14 +98,35 @@ public class WebServer {
     }
   }
 
-  /**
-   * Start the application.
-   * 
-   * @param args
-   *            Command line parameters are not used.
-   */
-  public static void main(String args[]) {
-    WebServer ws = new WebServer();
-    ws.start();
-  }
+    
+    public void GETHandler() {
+        
+        System.out.println("Handling a GET Method");
+    }
+
+    public void HEADHandler() {
+        System.out.println("Handling a HEAD Method");
+    }
+
+    public void PUTHandler() {
+        System.out.println("Handling a PUT Method");
+    }
+
+    public void DELETEHandler() {
+        System.out.println("Handling a DELETE Method");
+    }
+    
+    public void POSTHandler() {
+        System.out.println("Handling a POST Method");
+    }
+    /**
+    * Start the application.
+    * 
+    * @param args
+    *            Command line parameters are not used.
+    */
+    public static void main(String args[]) {
+        WebServer ws = new WebServer();
+        ws.start();
+    }
 }
