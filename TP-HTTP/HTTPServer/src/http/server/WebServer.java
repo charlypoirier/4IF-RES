@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -52,19 +54,47 @@ public class WebServer {
         // blank line signals the end of the client HTTP
         // headers.
         String str = ".";
-        while (str != null && !str.equals(""))
-          str = in.readLine();
-
+        String method = "";
+        
+        str = in.readLine();
+        if (str != null && !str.equals("")) {
+            String[] args = str.split("\\s");
+            if (args.length > 0) method = args[0];
+            if (!method.equals("GET")) return;
+        }
+        
+        String resource = "index.html";
+        while (str != null && !str.equals("")) {
+            System.out.println(str);
+            str = in.readLine();
+        }
+          
         // Send the response
         // Send the headers
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
+        
         // this blank line signals the end of the headers
         out.println("");
+        
         // Send the HTML page
-        out.println("<H1>Welcome to the Ultra Mini-WebServer</H2>");
+        BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader("../doc/"+resource));
+			String line = reader.readLine();
+			while (line != null) {
+                out.println(line);
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+        //out.println("<H1>Welcome to the Ultra Mini-WebServer</H2>");
         out.flush();
+
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);
