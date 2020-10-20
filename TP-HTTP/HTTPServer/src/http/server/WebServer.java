@@ -115,7 +115,7 @@ public class WebServer {
 
         if (!ressource.equals("/")) {
             // Open the file
-            reader = new BufferedReader(new FileReader("../doc" + ressource));
+            reader = new BufferedReader(new FileReader("../public" + ressource));
             
             // Sending header 
             out.println("HTTP/1.0 200 OK");
@@ -125,7 +125,7 @@ public class WebServer {
             // this blank line signals the end of the headers
             out.println("");
         } else {
-            reader = new BufferedReader(new FileReader("../doc/index.html"));
+            reader = new BufferedReader(new FileReader("../public/index.html"));
         }
         
         String line = reader.readLine();
@@ -142,7 +142,7 @@ public class WebServer {
         //POST is used to send data to a server to create/update a resource.
         //The data sent to the server with POST is stored in the request body of the HTTP request:
     
-        File rFile = new File("../doc" + ressource);
+        File rFile = new File("../public" + ressource);
         boolean exist = rFile.exists();
 
         // FileOutputStream(File file, boolean append)
@@ -151,7 +151,7 @@ public class WebServer {
 
     public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
         System.out.println("Handling a HEAD Method");
-        File rFile = new File("../doc" + ressource);
+        File rFile = new File("../public" + ressource);
         if(rFile.exists() && rFile.isFile()) {
             // Sending header
             out.println("HTTP/1.0 200 OK");
