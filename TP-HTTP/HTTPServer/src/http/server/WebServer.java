@@ -78,8 +78,28 @@ public class WebServer {
 
         // Handle request
         try {
-            if (parameters.get("method").equals("GET")) {
-                GETHandler(parameters.get("resource"), out);
+            switch (parameters.get("method")) {
+                case "GET":
+                    GETHandler(parameters.get("resource"), out);
+                    break;
+                case "POST":
+                    POSTHandler(parameters.get("resource"), out);
+                    break;
+                case "HEAD":
+                    HEADHandler(parameters.get("resource"), out);
+                    break;
+                case "PUT":
+                    PUTHandler();
+                    break;
+                case "DELETE":
+                    DELETEHandler();
+                    break;
+                default:
+                    out.println("HTTP/1.0 400 Bad Request");
+                    out.println("Content-Type: text/html");
+                    out.println("Server: Bot");
+                    out.println("");
+                    out.println("<p>Bad request (400)</p>");
             }
         } catch (FileNotFoundException e) {
             out.println("HTTP/1.0 404 Not Found");
