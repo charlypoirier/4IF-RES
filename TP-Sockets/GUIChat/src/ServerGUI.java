@@ -19,9 +19,10 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 	private JTextField tPortNumber;
 	
     // my server
-	private ChatServer server;
+	private Server server;
 	
-	
+
+
 	// server constructor that receive the port to listen to for connection as parameter
 	ServerGUI(int port) {
 		
@@ -34,7 +35,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		north.add(tPortNumber);
 		// to stop or start the server, we start with "Start"
 		stopStart = new JButton("Start");
-		stopStart.addActionListener(this);
+		// Style
+        stopStart.setBackground(Color.WHITE);
+        stopStart.addActionListener(this);
 		north.add(stopStart);
 		add(north, BorderLayout.NORTH);
 		
@@ -70,7 +73,8 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 	
 	// start or stop where clicked
 	public void actionPerformed(ActionEvent e) {
-		// if running we have to stop
+		
+        // if running we have to stop
 		if(server != null) {
 			server.stop();
 			server = null;
@@ -90,7 +94,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		}
 
 		// ceate a new Server
-		server = new ChatServer(port, this);
+		server = new Server(port, this);
 		
         // and start it as a thread
 		new ServerRunning().start();
@@ -134,7 +138,8 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 	class ServerRunning extends Thread {
 		public void run() {
 			server.start();         // should execute until if fails
-			// the server failed
+			
+            // the server failed
 			stopStart.setText("Start");
 			tPortNumber.setEditable(true);
 			appendEvent("Server crashed\n");

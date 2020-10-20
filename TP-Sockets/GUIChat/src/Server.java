@@ -1,8 +1,9 @@
-/***
- * ChatServer.java
+/**
+ * Server.java
  * TCP server for a socket-based chat system
  * Date: 13/10/2020
- * Authors: Jérôme Hue, Charly Poirier
+ * @Author: Jérôme Hue, Charly Poirier
+ *
  */
 
 import java.io.*;
@@ -10,34 +11,38 @@ import java.net.*;
 import java.util.*;
 import java.text.*;
 
-public class ChatServer  {
-
-    static ClientThread[] listCT = new ClientThread[100];
-    static int nbCT = 0;
-    
-    // a unique ID for each connection
+public class Server  {
+ 
+    /** a unique ID for each connection */
     private static int uniqueId;
-    // an ArrayList to keep the list of the Client
+    /** an ArrayList to keep the list of the Client */
     private ArrayList<ClientThread> al;
-    // an ArrayList to keep the list of messages
+    /** an ArrayList to keep the list of messages */
     private ArrayList<String> ml;
-    // if I am in a GUI
+    /** if I am in a GUI */
     private ServerGUI sg;
-    // to display time
+    /** to display time */
     private SimpleDateFormat sdf;
-    // the port number to listen for connection
+    /** the port number to listen for connection */
     private int port;
-    // the boolean that will be turned of to stop the server
+    /** the boolean that will be turned of to stop the server */
     private boolean keepGoing;
 
 
-    // Constructor without GUI
-    public ChatServer(int port) {
+    /** 
+      * Constructor without GUI
+      * @param port the server port
+      */
+    public Server(int port) {
         this(port, null);
     }
 
-    // Constructor with GUI
-    public ChatServer(int port, ServerGUI sg) {
+    /** 
+      * Consctructor without GUI
+      * @param port server host
+      * @param sg a server gui 
+      */
+    public Server(int port, ServerGUI sg) {
         // GUI or not
         this.sg = sg;
         // the port
@@ -53,14 +58,16 @@ public class ChatServer  {
         
     }
 
-    // Start the server
+    /** 
+      * Start the server
+      */
     public void start() {
         try {
             // Create a server socket associated with the server port
             ServerSocket serverSocket = new ServerSocket(port);
             
             // Display message saying that we are waiting
-            display("Server ready on port : "+ port + "." +keepGoing);
+            display("Server ready on port : "+ port);
             
             while(keepGoing) {
                 
@@ -69,14 +76,25 @@ public class ChatServer  {
 
                 if (!keepGoing) {
                     break; 
-            }
+                }
 
                 // Spawn a thread for new client
                 ClientThread t = new ClientThread(socket);
                 al.add(t); 
                 t.start();
             }
+            // handling server shutdown (keepGoing is now false)
+            
+            //Close listening socket
+            serverSocket.close();
 
+            //Close all client sockets
+            for(int i=0; i<al.size(); ++i){
+                ClientThread client = al.get(i);    
+                client.sInput.close();
+                client.sOutput.close();
+                client.socket.close();
+            }
 
         } catch (Exception e) {
             display("Error while running server");
@@ -85,10 +103,11 @@ public class ChatServer  {
     
     }
 
-    /*
-     * For the GUI to stop the server
+    /**
+     * Stop the server
      */
     protected void stop() {
+        display("Stoping server...");
         keepGoing = false;
         // connect to myself as Client to exit statement
         // Socket socket = serverSocket.accept();
@@ -96,10 +115,13 @@ public class ChatServer  {
             new Socket("localhost", port);
         }
         catch(Exception e) {
-            // nothing I can really do
+            // Print Trace
         }
     }
 
+    /**
+    * Display a message in server
+    */
     private void display(String msg) {
          String time = sdf.format(new Date()) + " " + msg;
          if(sg == null)
@@ -107,8 +129,9 @@ public class ChatServer  {
          else 
             sg.appendEvent(time + "\n");
      }
-    /*
-     *  to broadcast a message to all Clients
+
+    /**
+     *  Broadcast a message to all Clients
      */
     private synchronized void broadcast(String message) {
         // add HH:mm:ss and \n to the message
@@ -132,9 +155,13 @@ public class ChatServer  {
         }
     }
 
-    // for a client who logoff using the LOGOUT message
+    /**
+     * For a client who logoff using the LOGOUT message
+     */
     synchronized void remove(int id) {
         // scan the array list until we found the Id
+        // This is the reason we want an id attribute : 
+        // It makes things a lot simplier
         for(int i = 0; i < al.size(); ++i) {
             
             ClientThread ct = al.get(i);
@@ -149,38 +176,37 @@ public class ChatServer  {
 
 
  	/**
-  	* main method
-	* @param ChatServer port
-  	* 
-  	**/
+  	*   @param args Usage : java Server [portNumber]
+  	*/
     public static void main(String args[]){ 
         ServerSocket listenSocket;
         // start server on port 1500 unless a PortNumber is specified
         int portNumber = 1500;
-            switch(args.length) {
-             case 1:
-                 try {
-                     portNumber = Integer.parseInt(args[0]);
-                 }
-                 catch(Exception e) {
-                     System.out.println("Invalid port number.");
-                     System.out.println("Usage is: > java Server [portNumber]");
-                     return;
-                 }
-             case 0:
+        switch(args.length) {
+            case 1:
+                try {
+                         portNumber = Integer.parseInt(args[0]);
+                } catch(Exception e) {
+                    System.out.println("Invalid port number.");
+                    System.out.println("Usage is: > java Server [portNumber]");
+                    return;
+                }
+            case 0:
                  break;
-             default:
+            default:
                  System.out.println("Usage is: > java Server [portNumber]");
                 return;
 
             }
 
          // create a server object and start it
-         ChatServer server = new ChatServer(portNumber);
+         Server server = new Server(portNumber);
          server.start();
     }
 
-    /** One instance of this thread will run for each client */
+    /** 
+      * One instance of this thread will run for each client 
+     */
     class ClientThread extends Thread {
         // the socket where to listen/talk
         Socket socket;
