@@ -8,10 +8,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
+import java.io.File;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -65,9 +67,6 @@ public class WebServer {
             parameters.put("version", args[2]);
         } else return;
 
-        // Check request (only handle GET requests for now)
-        if (!parameters.get("method").equals("GET")) return;
-        
         // Parse header parameters
         while (str != null && !str.equals("")) {
             str = in.readLine();
@@ -76,27 +75,13 @@ public class WebServer {
                 parameters.put(args[0], args[1]);
             }
         }
-        
-        // Send the requested resource
-        BufferedReader reader;
-		try {
-            reader = new BufferedReader(new FileReader("../doc" + parameters.get("resource")));
-                
-            // Send the headers
-            out.println("HTTP/1.0 200 OK");
-            out.println("Content-Type: text/html"); // TODO: Verify content-type (image/png, ...)
-            out.println("Server: Bot");
-            out.println("");
 
-            // Send the file
-			String line = reader.readLine();
-			while (line != null) {
-                out.println(line);
-				line = reader.readLine();
-			}
-            reader.close();
-
-		} catch (FileNotFoundException e) {
+        // Handle request
+        try {
+            if (parameters.get("method").equals("GET")) {
+                GETHandler(parameters.get("resource"), out);
+            }
+        } catch (FileNotFoundException e) {
             out.println("HTTP/1.0 404 Not Found");
             out.println("Content-Type: text/html");
             out.println("Server: Bot");
@@ -112,22 +97,86 @@ public class WebServer {
 		}
 
         out.flush();
-
         remote.close();
+        
       } catch (Exception e) {
         System.out.println("Error: " + e);
       }
     }
   }
+    
+    public void GETHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+        
+        // Displaying requested ressources
+        System.out.println("GET " +ressource);
+       
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        // this blank line signals the end of the headers
+        out.println("");
 
-  /**
-   * Start the application.
-   * 
-   * @param args
-   *            Command line parameters are not used.
-   */
-  public static void main(String args[]) {
-    WebServer ws = new WebServer();
-    ws.start();
-  }
+        // Send the html page requested
+        BufferedReader reader;
+
+        if (!ressource.equals("/")) {
+            reader = new BufferedReader(new FileReader("../doc" + ressource));
+        } else {
+            reader = new BufferedReader(new FileReader("../doc/index.html"));
+        }
+        
+        String line = reader.readLine();
+        while (line != null) {
+            out.println(line);
+            line = reader.readLine();
+        }
+        reader.close();
+    }
+    
+    public void POSTHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+        System.out.println("POST " +ressource);
+
+        //POST is used to send data to a server to create/update a resource.
+        //The data sent to the server with POST is stored in the request body of the HTTP request:
+    
+        File rFile = new File("../doc" + ressource);
+        boolean exist = rFile.exists();
+
+        // FileOutputStream(File file, boolean append)
+        FileOutputStream fos = new FileOutputStream(rFile, exist);
+    }
+
+    public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+        System.out.println("Handling a HEAD Method");
+        File rFile = new File("../doc" + ressource);
+        if(rFile.exists() && rFile.isFile()) {
+            // Sending header
+            out.println("HTTP/1.0 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            out.println("");
+        } else {}
+        out.flush();
+    }
+
+    public void PUTHandler() throws FileNotFoundException, IOException {
+        System.out.println("Handling a PUT Method");
+    }
+
+    public void DELETEHandler() throws FileNotFoundException, IOException {
+        System.out.println("Handling a DELETE Method");
+    }
+    
+    /**
+    * Start the application.
+    * 
+    * @param args
+    *            Command line parameters are not used.
+    */
+    public static void main(String args[]) {
+        WebServer ws = new WebServer();
+        ws.start();
+    }
 }
