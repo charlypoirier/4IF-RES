@@ -109,20 +109,21 @@ public class WebServer {
         
         // Displaying requested ressources
         System.out.println("GET " +ressource);
-       
-        // Sending header 
-        out.println("HTTP/1.0 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        
-        // this blank line signals the end of the headers
-        out.println("");
 
         // Send the html page requested
         BufferedReader reader;
 
         if (!ressource.equals("/")) {
+            // Open the file
             reader = new BufferedReader(new FileReader("../doc" + ressource));
+            
+            // Sending header 
+            out.println("HTTP/1.0 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            
+            // this blank line signals the end of the headers
+            out.println("");
         } else {
             reader = new BufferedReader(new FileReader("../doc/index.html"));
         }
