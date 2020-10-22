@@ -1,7 +1,5 @@
-///A Simple Web Server (WebServer.java)
 
 package http.server;
-
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,14 +21,10 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
- * Java Copyright 2001 by Jeff Heaton
+ * A web server that handles GET, HEAD, POST, PUT and DELETE
+ * requests, multiples error codes and media files.
  * 
- * WebServer is a very simple web-server. Any request is responded with a very
- * simple web-page.
- * 
- * @author Jeff Heaton
- * @version 1.0
+ * @author Jérôme Hue, Charly Poirier
  */
 public class WebServer {
 
