@@ -86,7 +86,6 @@ public class WebServer {
             }
         }
         
-
         // Handle request
         try {
             switch (parameters.get("method")) {
@@ -146,66 +145,47 @@ public class WebServer {
       }
     }
   }
-    
-    public void GETHandler(String ressource, OutputStream os) throws FileNotFoundException, IOException {
-        
-        PrintWriter out = new PrintWriter(os);
+    /**
+     * The HTTP GET method requests a representation of the specified resource.
+     * Requests using GET should only retrieve data.
+     * 
+     * @param resource
+     */
+    public void GETHandler(String resource, OutputStream os) throws FileNotFoundException, IOException {
 
-        /*
-            The HTTP GET method requests a representation of the specified resource.
-            Requests using GET should only retrieve data.
-        */
+        // Display the requested resource
+        System.out.println("GET " + resource);
 
-        System.out.println("GET " + ressource);
-
-        if (ressource.equals("/")) {
-            ressource = "/index.html";
-        }
-
-        Path path = Paths.get("../public" + ressource);
-        String type = Files.probeContentType(path);
-        
-        if (type == null) {
-            type = "text/html";
-        }
-        
+        // Open the resource
+        if (resource.equals("/")) resource = "/index.html";
+        Path path = Paths.get("../public" + resource);
         File file = new File(path.toString());
 
-        if (type.startsWith("text")) {
-            
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            
-            out.println("HTTP/1.0 200 OK");
-            out.println("Content-Type: " + type);
-            out.println("Server: Bot");
-            out.println("");
+        // Fetch file type
+        String type = Files.probeContentType(path);
+        if (type == null) type = "text/html";
 
-            String line = reader.readLine();
-            while (line != null) {
-                out.println(line);
-                line = reader.readLine();
-            }
+        BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
+        
+        // Header
+        os.write("HTTP/1.0 200 OK\n".getBytes());
+        os.write(("Content-Type: " + type + "\n").getBytes());
+        os.write("Server: Bot\n".getBytes());
+        os.write("\n".getBytes());
 
-            reader.close();
-            out.flush();
-
-        } else {
-            /*
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-            */
-
-            // https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html#readFileToByteArray(java.io.File)
+        // Body
+        int size;
+        byte[] buffer = new byte[256];
+        while((size = input.read(buffer)) != -1) {
+            os.write(buffer, 0, size);
         }
-
-
+        
+        input.close();
+        os.flush();
     }
     
-    public void POSTHandler(String ressource, PrintWriter out, BufferedReader in, String body) throws FileNotFoundException, IOException {
-        System.out.println("POST " +ressource);
+    public void POSTHandler(String resource, PrintWriter out, BufferedReader in, String body) throws FileNotFoundException, IOException {
+        System.out.println("POST " + resource);
 
         
         //POST is used to send data to a server to create/update a resource.
@@ -228,23 +208,22 @@ public class WebServer {
         out.println("");
 
 
-        File rFile = new File("../public" + ressource);
+        File rFile = new File("../public" + resource);
         boolean exist = rFile.exists();
 
     }
-
-    public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
-
-        /*
-            The HTTP HEAD method requests the headers that would be returned if
-            the HEAD request's URL was instead requested with the HTTP GET method.
-        */
-
-        // Displaying requested ressources
-        System.out.println("HEAD " + ressource);
+    
+    /**
+     * The HTTP HEAD method requests the headers that would be returned if
+     * the HEAD request's URL was instead requested with the HTTP GET method.
+     */
+    public void HEADHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
+        
+        // Displaying requested resources
+        System.out.println("HEAD " + resource);
 
         // Check if the file exists
-        Path path = Paths.get("../public" + ressource);
+        Path path = Paths.get("../public" + resource);
         String type = Files.probeContentType(path);
         File file = new File(path.toString());
 
@@ -284,17 +263,17 @@ public class WebServer {
         out.println("");
     }
 
-    public void DELETEHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+    public void DELETEHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
 
         /*
             The HTTP DELETE request method deletes the specified resource.
         */
 
-        // Displaying requested ressources
-        System.out.println("DELETE " + ressource);
+        // Displaying requested resources
+        System.out.println("DELETE " + resource);
 
         // Check if the file exists
-        File file = new File("../public" + ressource);
+        File file = new File("../public" + resource);
         if (file.exists() && file.isFile() && file.delete()) {
             out.println("HTTP/1.0 204 No Content");    
             out.println("Server: Bot");
