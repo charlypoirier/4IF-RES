@@ -4,14 +4,15 @@
  * Date: 13/10/2020
  * Authors: Jérôme Hue, Charly Poirier
  */
-
 package stream;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-
+/**
+ * Server class for the TCP chat
+ */
 public class ChatServer  {
 
     static ClientThread[] listCT = new ClientThread[100];
@@ -19,11 +20,14 @@ public class ChatServer  {
     static ArrayList<String> history = new ArrayList<String>();
 
  	/**
-  	* main method
-	* @param ChatServer port
-  	* 
-  	**/
-    public static void main(String args[]){ 
+  	 * Main method
+     *   
+     * Connects to a server, listens for messages
+     * and sends messages
+     * 
+	 * @param args arguments [port]
+  	 */
+    public static void main(String args[]) { 
         ServerSocket listenSocket;
   	    if (args.length != 1) {
             System.out.println("Usage: java ChatServer <ChatServer port>");
@@ -45,8 +49,12 @@ public class ChatServer  {
         }
     }
 
-    public static synchronized void incrementCT(ClientThread ct ){
-        // Update global variables.
+    /**
+     * Updates global variables (list and number of connected clients)
+     *
+     * @param ct A client thread object
+     */
+    public static synchronized void incrementCT(ClientThread ct) {
         listCT[nbCT] = ct;
         nbCT = nbCT +1;
     }

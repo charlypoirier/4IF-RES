@@ -9,12 +9,21 @@ package stream;
 import java.io.*;
 import java.net.*;
 
+/**
+ * Client class for the TCP chat
+ */
 public class ChatClient {
  
     /**
-    *  Main method
-    *  Accepts a connection, receives and sends messages 
-    **/
+     * Main method
+     * 
+     * Accepts a connection, creates a client thread,
+     * receives and sends messages
+     * 
+     * @param args arguments [server_address, port]
+     *
+     * @throws IOException Thrown when server had problems closing sockets
+     */
     public static void main(String[] args) throws IOException {
 
         Socket serverSocket  = null;
@@ -28,13 +37,9 @@ public class ChatClient {
         }
 
         try {
-            // Connection socket
       	    serverSocket = new Socket(args[0], new Integer(args[1]).intValue());
-            // Pipe for incoming messages
             socIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-            // Pipe for outcoming messages
-            socOut= new PrintStream(serverSocket.getOutputStream());
-            // Standard output (terminal)
+            socOut = new PrintStream(serverSocket.getOutputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("[Connected]");
         } catch (UnknownHostException e) {
@@ -45,7 +50,7 @@ public class ChatClient {
             System.exit(1);
         }
         
-        // Listen for incoming messages (thread)
+        // Listen for incoming messages (new thread)
         MessageListener ct = new MessageListener(socIn);
         ct.start();
 
@@ -56,9 +61,11 @@ public class ChatClient {
             if (message.equals(".")) break;
         	socOut.println(message);
         }
+
         socOut.close();
         socIn.close();
         stdIn.close();
         serverSocket.close();
     }
+
 }

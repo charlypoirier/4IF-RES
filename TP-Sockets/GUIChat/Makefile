@@ -10,6 +10,9 @@ server:
 client:
 	@cd classes/; java ClientGUI
 
+javadoc:
+	javadoc -d doc/ ${sources}
+
 clean:
 	rm -rf classes/*
 

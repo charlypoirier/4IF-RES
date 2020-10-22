@@ -7,6 +7,9 @@ all:
 user:
 	@cd classes/; java GroupChat 230.0.0.0 5000
 
+javadoc:
+	javadoc -d doc/ ${sources}
+
 clean:
 	rm -rf classes/*
 
