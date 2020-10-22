@@ -109,7 +109,7 @@ public class WebServer {
                         bodyLine = in.readLine();
                     }*/
 
-                    POSTHandler(parameters.get("resource"), out);
+                    POSTHandler(parameters.get("resource"), out, in, body);
                     break;
                 case "HEAD":
                     HEADHandler(parameters.get("resource"), out);
