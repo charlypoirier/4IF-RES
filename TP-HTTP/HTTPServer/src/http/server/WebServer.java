@@ -92,12 +92,10 @@ public class WebServer {
         // Handle request
         try {
             switch (parameters.get("method")) {
-                case "GET": 
+                case "GET":
                     GETHandler(parameters.get("resource"), out);
                     break;
                 case "POST":
-                    System.out.println("Content size : "+ parameters.get("Content-Length"));
-                     
                     String bodyLine = ""; 
                     char c; 
                     for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
@@ -110,9 +108,25 @@ public class WebServer {
                         System.out.println(bodyLine);
                         bodyLine = in.readLine();
                     }*/
-                    POSTHandler(parameters.get("ressource"), out, in, bodyLine);
+
+                    POSTHandler(parameters.get("resource"), out);
                     break;
-            }        
+                case "HEAD":
+                    HEADHandler(parameters.get("resource"), out);
+                    break;
+                case "PUT":
+                    PUTHandler();
+                    break;
+                case "DELETE":
+                    DELETEHandler();
+                    break;
+                default:
+                    out.println("HTTP/1.0 400 Bad Request");
+                    out.println("Content-Type: text/html");
+                    out.println("Server: Bot");
+                    out.println("");
+                    out.println("<p>Bad request (400)</p>");
+            }
         } catch (FileNotFoundException e) {
             out.println("HTTP/1.0 404 Not Found");
             out.println("Content-Type: text/html");
@@ -141,20 +155,21 @@ public class WebServer {
         
         // Displaying requested ressources
         System.out.println("GET " +ressource);
-       
-        // Sending header 
-        out.println("HTTP/1.0 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        
-        // this blank line signals the end of the headers
-        out.println("");
 
         // Send the html page requested
         BufferedReader reader;
 
         if (!ressource.equals("/")) {
+            // Open the file
             reader = new BufferedReader(new FileReader("../public" + ressource));
+            
+            // Sending header 
+            out.println("HTTP/1.0 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("Server: Bot");
+            
+            // this blank line signals the end of the headers
+            out.println("");
         } else {
             reader = new BufferedReader(new FileReader("../public/index.html"));
         }
@@ -176,19 +191,6 @@ public class WebServer {
     
         // Example of Post request from https://www.tutorialspoint.com/http/http_methods.htm
 
-        /*
-        POST /cgi-bin/process.cgi HTTP/1.1
-        User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
-        Host: www.tutorialspoint.com
-        Content-Type: text/xml; charset=utf-8
-        Content-Length: 88
-        Accept-Language: en-us
-        Accept-Encoding: gzip, deflate
-        Connection: Keep-Alive
-
-        param1=value1&param2=value2
-        */   
-
         // In this lab work, we are just displaying post data.
 
         System.out.println(body);
@@ -204,6 +206,8 @@ public class WebServer {
         out.println("");
 
 
+        File rFile = new File("../public" + ressource);
+        boolean exist = rFile.exists();
 
     }
 
