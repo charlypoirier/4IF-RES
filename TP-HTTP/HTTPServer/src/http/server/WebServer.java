@@ -85,6 +85,7 @@ public class WebServer {
                     }
                 }
                 
+                System.out.println("Parameters : " + parameters) ;               
                 // Handle request
                 try {
                     switch (parameters.get("method")) {
@@ -193,9 +194,20 @@ public class WebServer {
             bodyLine = bodyLine + c;        
         }
 
-        System.out.println("Parameters : " +bodyLine);
+
 
         
+        Map<String, String> parameters = new HashMap<String, String>();
+        String[] parameters_list = bodyLine.split("&");
+        
+        for(int i=0; i< parameters_list.length; i++) {
+            String[] p = parameters_list[i].split("=");
+            parameters.put(p[0],p[1]);        
+        }
+                
+        System.out.println("parameters : " + parameters);
+
+
         // Sending header 
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
@@ -252,9 +264,20 @@ public class WebServer {
             bodyLine = bodyLine + c;        
         }
 
+        String[]  params = bodyLine.split("&");
+        
         System.out.println("Parameters : " +bodyLine);
 
-
+        
+        Map<String, String> parameters = new HashMap<String, String>();
+        String[] parameters_list = bodyLine.split("&");
+        
+        for(int i=0; i< parameters_list.length; i++) {
+            String[] p = parameters_list[i].split("=");
+            parameters.put(p[0],p[1]);        
+        }
+                
+        System.out.println("parameters : " + parameters);
 
         // Write in file // for put.
         BufferedWriter outf = null; 
