@@ -4,12 +4,14 @@
  * Date: 13/10/2020
  * Authors: Jérôme Hue, Charly Poirier
  */
-
 package stream;
 
 import java.io.*;
 import java.net.*;
 
+/**
+ * Thread that handle communication with a client
+ */
 public class ClientThread extends Thread {
 	
 	private Socket clientSocket;
@@ -17,6 +19,11 @@ public class ClientThread extends Thread {
 	
     static int nbClients;
 
+    /**
+     * Constructor
+     *
+     * @param s A communication socket
+     */
 	ClientThread(Socket s) {
 		this.clientSocket = s;
         try {
@@ -24,13 +31,11 @@ public class ClientThread extends Thread {
     	} catch (Exception e) {
         	System.err.println("Error in ChatServer:" + e); 
         }
-
 	}
 
  	/**
-  	* Receives a message from client and sends it back to everyone
-  	* @param clientSocket the client socket
-  	**/
+  	 * Receives a message from client and sends it back to everyone
+  	 */
 	public void run() {
         
         // Display message history
@@ -39,7 +44,6 @@ public class ClientThread extends Thread {
                 ChatServer.listCT[ChatServer.nbCT - 1].send(ChatServer.history.get(i));
             }
         }
-        
         
         try {
             BufferedReader socIn = null;
@@ -72,6 +76,11 @@ public class ClientThread extends Thread {
         }
     }
     
+    /**
+     * Sends a message in the chat
+     *
+     * @param message The message to be sent
+     */
     public void send(String message) {
         try {
             this.socOut.println(message);
