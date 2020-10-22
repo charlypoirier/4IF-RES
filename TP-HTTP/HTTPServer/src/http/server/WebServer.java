@@ -151,7 +151,7 @@ public class WebServer {
      * The HTTP GET method requests a representation of the specified resource.
      * Requests using GET should only retrieve data.
      * 
-     * @param resource
+     * @param resource The requested resource
      */
     public void GETHandler(String resource, OutputStream os) throws FileNotFoundException, IOException {
 
