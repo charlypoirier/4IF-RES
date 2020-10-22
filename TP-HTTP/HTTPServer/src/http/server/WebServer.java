@@ -109,13 +109,14 @@ public class WebServer {
                         bodyLine = in.readLine();
                     }*/
 
-                    POSTHandler(parameters.get("resource"), out, in, body);
+                    POSTHandler(parameters.get("resource"), out, in, bodyLine);
                     break;
                 case "HEAD":
                     HEADHandler(parameters.get("resource"), out);
                     break;
                 case "PUT":
-                    PUTHandler();
+                    String body = "This is just a test";
+                    PUTHandler(parameters.get("ressource"), out, body);
                     break;
                 case "DELETE":
                     DELETEHandler();
