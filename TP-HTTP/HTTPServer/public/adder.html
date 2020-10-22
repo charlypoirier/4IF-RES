@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)https://moodle.insa-lyon.fr/pluginfile.php/170462/course/section/45839/Adder.html -->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Adding two numbers</title>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <h1>Adding two numbers</h1>
+        <a href="index.html">Back to the Index</a><br/><br/>
+        Enter First Number: <input id="first"><br/>
+        Enter Second Number: <input id="second"><br/>
+        <button onclick="add()">Add</button><br/>
+        Result is: <input id="answer">
+    </body>
+    <script>
+        function add() {
+			let a, b, c;
+			a = Number(document.getElementById("first").value);
+			b = Number(document.getElementById("second").value);
+			c = a + b;
+			document.getElementById("answer").value = c;
+        }
+    </script>
+</html>
