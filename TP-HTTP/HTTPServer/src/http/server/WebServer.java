@@ -94,7 +94,7 @@ public class WebServer {
                             break;
                         case "POST":
                             int l = Integer.parseInt(parameters.get("Content-Length"));
-                            POSTHandler(parameters.get("resource"), out, in,  l);
+                            POSTHandler(parameters.get("resource"), out, in,  l, parameters.get("Content-Type"));
                             break;
                         case "HEAD":
                             HEADHandler(parameters.get("resource"), out);
@@ -175,8 +175,12 @@ public class WebServer {
         input.close();
         os.flush();
     }
-    
-    public void POSTHandler(String resource, PrintWriter out, BufferedReader in,  int length) throws FileNotFoundException, IOException {
+   
+    /**
+    * The HTTP POST method sends data to the server. 
+    * The type of the body of the request is indicated by the Content-Type header. 
+    */ 
+    public void POSTHandler(String resource, PrintWriter out, BufferedReader in,  int length, String content_type) throws FileNotFoundException, IOException {
         System.out.println("POST " + resource);
 
         
