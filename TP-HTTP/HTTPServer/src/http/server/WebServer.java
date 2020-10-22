@@ -2,6 +2,7 @@
 
 package http.server;
 
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -17,6 +18,9 @@ import java.util.HashMap;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.*;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -90,13 +94,25 @@ public class WebServer {
                     GETHandler(parameters.get("resource"), os);
                     break;
                 case "POST":
-                    POSTHandler(parameters.get("resource"), out);
+                    String bodyLine = ""; 
+                    char c; 
+                    for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
+                        c = (char) in.read();
+                        bodyLine = bodyLine + c;        
+                    }
+                    System.out.println("> " + bodyLine);
+                   /* 
+                    while(bodyLine != null && bodyLine.length() > 0){
+                        System.out.println(bodyLine);
+                        bodyLine = in.readLine();
+                    }*/
+                    POSTHandler(parameters.get("resource"), out, in, "");
                     break;
                 case "HEAD":
                     HEADHandler(parameters.get("resource"), out);
                     break;
                 case "PUT":
-                    PUTHandler();
+                    PUTHandler(parameters.get("resource"), out, "");
                     break;
                 case "DELETE":
                     DELETEHandler(parameters.get("resource"), out);
@@ -188,17 +204,33 @@ public class WebServer {
 
     }
     
-    public void POSTHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+    public void POSTHandler(String ressource, PrintWriter out, BufferedReader in, String body) throws FileNotFoundException, IOException {
         System.out.println("POST " +ressource);
 
+        
         //POST is used to send data to a server to create/update a resource.
         //The data sent to the server with POST is stored in the request body of the HTTP request:
     
+        // Example of Post request from https://www.tutorialspoint.com/http/http_methods.htm
+
+        // In this lab work, we are just displaying post data.
+
+        System.out.println(body);
+
+
+        
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        //Blank line at the end of header
+        out.println("");
+
+
         File rFile = new File("../public" + ressource);
         boolean exist = rFile.exists();
 
-        // FileOutputStream(File file, boolean append)
-        FileOutputStream fos = new FileOutputStream(rFile, exist);
     }
 
     public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
@@ -230,8 +262,26 @@ public class WebServer {
         
     }
 
-    public void PUTHandler() throws FileNotFoundException, IOException {
+    public void PUTHandler(String filename, PrintWriter out, String body) throws FileNotFoundException, IOException {
         System.out.println("Handling a PUT Method");
+    
+    
+        System.out.println(body);
+
+
+        // Write in file // for put.
+        BufferedWriter outf = null; 
+        FileWriter fstream = new FileWriter("out.txt", true); //true tells to append data.
+        outf = new BufferedWriter(fstream);
+        outf.write(body);
+     
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        //Blank line at the end of header
+        out.println("");
     }
 
     public void DELETEHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
