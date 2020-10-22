@@ -2,6 +2,7 @@
 
 package http.server;
 
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -14,6 +15,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -46,17 +50,23 @@ public class WebServer {
     System.out.println("Waiting for connection");
     for (;;) {
       try {
+        
         // wait for a connection
         Socket remote = s.accept();
+
         // remote is now the connected socket
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-            remote.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
         PrintWriter out = new PrintWriter(remote.getOutputStream());
 
         // Parse data from the header
         Map<String, String> parameters = new HashMap<String, String>();
 
         // First header line
+        
+        //String line =  in.lines().collect(Collectors.joining());
+        //System.out.println("> " + line);
+        
+
         String str = in.readLine();
         if (str == null || str.equals("")) return;
         
@@ -66,21 +76,43 @@ public class WebServer {
             parameters.put("resource", args[1]);
             parameters.put("version", args[2]);
         } else return;
-
+        
         // Parse header parameters
-        while (str != null && !str.equals("")) {
+        while (str.length() > 0) {
             str = in.readLine();
+            System.out.println("Read line : "+str);
             args = str.split(": ");
             if (args.length > 1) {
                 parameters.put(args[0], args[1]);
             }
         }
+       
+        System.out.println(parameters); 
 
         // Handle request
         try {
-            if (parameters.get("method").equals("GET")) {
-                GETHandler(parameters.get("resource"), out);
-            }
+            switch (parameters.get("method")) {
+                case "GET": 
+                    GETHandler(parameters.get("resource"), out);
+                    break;
+                case "POST":
+                    System.out.println("Content size : "+ parameters.get("Content-Length"));
+                     
+                    String bodyLine = ""; 
+                    char c; 
+                    for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
+                        c = (char) in.read();
+                        bodyLine = bodyLine + c;        
+                    }
+                    System.out.println("> " + bodyLine);
+                   /* 
+                    while(bodyLine != null && bodyLine.length() > 0){
+                        System.out.println(bodyLine);
+                        bodyLine = in.readLine();
+                    }*/
+                    POSTHandler(parameters.get("ressource"), out, in, bodyLine);
+                    break;
+            }        
         } catch (FileNotFoundException e) {
             out.println("HTTP/1.0 404 Not Found");
             out.println("Content-Type: text/html");
@@ -122,9 +154,9 @@ public class WebServer {
         BufferedReader reader;
 
         if (!ressource.equals("/")) {
-            reader = new BufferedReader(new FileReader("../doc" + ressource));
+            reader = new BufferedReader(new FileReader("../public" + ressource));
         } else {
-            reader = new BufferedReader(new FileReader("../doc/index.html"));
+            reader = new BufferedReader(new FileReader("../public/index.html"));
         }
         
         String line = reader.readLine();
@@ -135,22 +167,49 @@ public class WebServer {
         reader.close();
     }
     
-    public void POSTHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+    public void POSTHandler(String ressource, PrintWriter out, BufferedReader in, String body) throws FileNotFoundException, IOException {
         System.out.println("POST " +ressource);
 
+        
         //POST is used to send data to a server to create/update a resource.
         //The data sent to the server with POST is stored in the request body of the HTTP request:
     
-        File rFile = new File("../doc" + ressource);
-        boolean exist = rFile.exists();
+        // Example of Post request from https://www.tutorialspoint.com/http/http_methods.htm
 
-        // FileOutputStream(File file, boolean append)
-        FileOutputStream fos = new FileOutputStream(rFile, exist);
+        /*
+        POST /cgi-bin/process.cgi HTTP/1.1
+        User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)
+        Host: www.tutorialspoint.com
+        Content-Type: text/xml; charset=utf-8
+        Content-Length: 88
+        Accept-Language: en-us
+        Accept-Encoding: gzip, deflate
+        Connection: Keep-Alive
+
+        param1=value1&param2=value2
+        */   
+
+        // In this lab work, we are just displaying post data.
+
+        System.out.println(body);
+
+
+        
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        //Blank line at the end of header
+        out.println("");
+
+
+
     }
 
     public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
         System.out.println("Handling a HEAD Method");
-        File rFile = new File("../doc" + ressource);
+        File rFile = new File("../public" + ressource);
         if(rFile.exists() && rFile.isFile()) {
             // Sending header
             out.println("HTTP/1.0 200 OK");
@@ -161,8 +220,26 @@ public class WebServer {
         out.flush();
     }
 
-    public void PUTHandler() throws FileNotFoundException, IOException {
+    public void PUTHandler(String filename, PrintWriter out, String body) throws FileNotFoundException, IOException {
         System.out.println("Handling a PUT Method");
+    
+    
+        System.out.println(body);
+
+
+        // Write in file // for put.
+        BufferedWriter outf = null; 
+        FileWriter fstream = new FileWriter("out.txt", true); //true tells to append data.
+        outf = new BufferedWriter(fstream);
+        outf.write(body);
+     
+        // Sending header 
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        //Blank line at the end of header
+        out.println("");
     }
 
     public void DELETEHandler() throws FileNotFoundException, IOException {
