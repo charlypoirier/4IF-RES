@@ -4,6 +4,7 @@ package http.server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.*;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -46,41 +49,45 @@ public class WebServer {
     System.out.println("Waiting for connection");
     for (;;) {
       try {
-        // wait for a connection
+
+        // Wait for a connection
         Socket remote = s.accept();
-        // remote is now the connected socket
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-            remote.getInputStream()));
-        PrintWriter out = new PrintWriter(remote.getOutputStream());
+
+        // Remote is now the connected socket
+        BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
+        OutputStream os = remote.getOutputStream();
+        PrintWriter out = new PrintWriter(os);
 
         // Parse data from the header
         Map<String, String> parameters = new HashMap<String, String>();
 
-        // First header line
         String str = in.readLine();
-        if (str == null || str.equals("")) return;
-        
-        String[] args = str.split("\\s");
-        if (args.length >= 2) {
-            parameters.put("method", args[0]);
-            parameters.put("resource", args[1]);
-            parameters.put("version", args[2]);
-        } else return;
+        if (str != null && !str.equals("")) {
+            // First line
+            String[] args = str.split("\\s");
+            if (args.length >= 2) {
+                parameters.put("method", args[0]);
+                parameters.put("resource", args[1]);
+                parameters.put("version", args[2]);
+            }
 
-        // Parse header parameters
-        while (str != null && !str.equals("")) {
+            // Header parameters
             str = in.readLine();
-            args = str.split(": ");
-            if (args.length > 1) {
-                parameters.put(args[0], args[1]);
+            while (str != null && !str.equals("")) {
+                args = str.split(": ");
+                if (args.length > 1) {
+                    parameters.put(args[0], args[1]);
+                }
+                str = in.readLine();
             }
         }
+        
 
         // Handle request
         try {
             switch (parameters.get("method")) {
                 case "GET":
-                    GETHandler(parameters.get("resource"), out);
+                    GETHandler(parameters.get("resource"), os);
                     break;
                 case "POST":
                     POSTHandler(parameters.get("resource"), out);
@@ -92,7 +99,7 @@ public class WebServer {
                     PUTHandler();
                     break;
                 case "DELETE":
-                    DELETEHandler();
+                    DELETEHandler(parameters.get("resource"), out);
                     break;
                 default:
                     out.println("HTTP/1.0 400 Bad Request");
@@ -107,7 +114,7 @@ public class WebServer {
             out.println("Server: Bot");
             out.println("");
             out.println("<p>Not found (404)</p>");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             out.println("HTTP/1.0 500 Internal Server Error");
             out.println("Content-Type: text/html");
@@ -115,45 +122,70 @@ public class WebServer {
             out.println("");
             out.println("<p>Internal Server Error (500)</p>");
 		}
-
         out.flush();
         remote.close();
-        
       } catch (Exception e) {
         System.out.println("Error: " + e);
+        e.printStackTrace();
       }
     }
   }
     
-    public void GETHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+    public void GETHandler(String ressource, OutputStream os) throws FileNotFoundException, IOException {
         
-        // Displaying requested ressources
-        System.out.println("GET " +ressource);
+        PrintWriter out = new PrintWriter(os);
 
-        // Send the html page requested
-        BufferedReader reader;
+        /*
+            The HTTP GET method requests a representation of the specified resource.
+            Requests using GET should only retrieve data.
+        */
 
-        if (!ressource.equals("/")) {
-            // Open the file
-            reader = new BufferedReader(new FileReader("../public" + ressource));
+        System.out.println("GET " + ressource);
+
+        if (ressource.equals("/")) {
+            ressource = "/index.html";
+        }
+
+        Path path = Paths.get("../public" + ressource);
+        String type = Files.probeContentType(path);
+        
+        if (type == null) {
+            type = "text/html";
+        }
+        
+        File file = new File(path.toString());
+
+        if (type.startsWith("text")) {
             
-            // Sending header 
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            
             out.println("HTTP/1.0 200 OK");
-            out.println("Content-Type: text/html");
+            out.println("Content-Type: " + type);
             out.println("Server: Bot");
-            
-            // this blank line signals the end of the headers
             out.println("");
+
+            String line = reader.readLine();
+            while (line != null) {
+                out.println(line);
+                line = reader.readLine();
+            }
+
+            reader.close();
+            out.flush();
+
         } else {
-            reader = new BufferedReader(new FileReader("../public/index.html"));
+            /*
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            */
+
+            // https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html#readFileToByteArray(java.io.File)
         }
-        
-        String line = reader.readLine();
-        while (line != null) {
-            out.println(line);
-            line = reader.readLine();
-        }
-        reader.close();
+
+
     }
     
     public void POSTHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
@@ -170,24 +202,59 @@ public class WebServer {
     }
 
     public void HEADHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
-        System.out.println("Handling a HEAD Method");
-        File rFile = new File("../public" + ressource);
-        if(rFile.exists() && rFile.isFile()) {
-            // Sending header
+
+        /*
+            The HTTP HEAD method requests the headers that would be returned if
+            the HEAD request's URL was instead requested with the HTTP GET method.
+        */
+
+        // Displaying requested ressources
+        System.out.println("HEAD " + ressource);
+
+        // Check if the file exists
+        Path path = Paths.get("../public" + ressource);
+        String type = Files.probeContentType(path);
+        File file = new File(path.toString());
+
+        if (file.exists() && file.isFile()) {
             out.println("HTTP/1.0 200 OK");
-            out.println("Content-Type: text/html");
+            out.println("Content-Type: " + type);
+            out.println("Content-Length: " + file.length());
             out.println("Server: Bot");
             out.println("");
-        } else {}
-        out.flush();
+        } else {
+            out.println("HTTP/1.0 404 Not Found");
+            out.println("Server: Bot");
+            out.println("");
+        }
+        
     }
 
     public void PUTHandler() throws FileNotFoundException, IOException {
         System.out.println("Handling a PUT Method");
     }
 
-    public void DELETEHandler() throws FileNotFoundException, IOException {
-        System.out.println("Handling a DELETE Method");
+    public void DELETEHandler(String ressource, PrintWriter out) throws FileNotFoundException, IOException {
+
+        /*
+            The HTTP DELETE request method deletes the specified resource.
+        */
+
+        // Displaying requested ressources
+        System.out.println("DELETE " + ressource);
+
+        // Check if the file exists
+        File file = new File("../public" + ressource);
+        if (file.exists() && file.isFile() && file.delete()) {
+            out.println("HTTP/1.0 204 No Content");    
+            out.println("Server: Bot");
+            out.println("");
+        } else {
+            out.println("HTTP/1.0 404 Not Found");    
+            out.println("Server: Bot");
+            out.println("");
+        }
+
     }
     
     /**

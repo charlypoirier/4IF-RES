@@ -1,1 +1,1 @@
-alert("Alert from /script.js");
+console.log("Script chargé!");
