@@ -34,124 +34,125 @@ import java.util.stream.*;
  */
 public class WebServer {
 
-  /**
-   * WebServer constructor.
-   */
-  protected void start() {
-    ServerSocket s;
+    /**
+     * WebServer constructor.
+     */
+    protected void start() {
+        ServerSocket s;
 
-    System.out.println("Webserver starting up on port 80");
-    System.out.println("(press ctrl-c to exit)");
-    try {
-      // create the main server socket
-      s = new ServerSocket(3000);
-    } catch (Exception e) {
-      System.out.println("Error: " + e);
-      return;
-    }
-
-    System.out.println("Waiting for connection");
-    for (;;) {
-      try {
-
-        // Wait for a connection
-        Socket remote = s.accept();
-
-        // Remote is now the connected socket
-        BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
-        OutputStream os = remote.getOutputStream();
-        PrintWriter out = new PrintWriter(os);
-
-        // Parse data from the header
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        String str = in.readLine();
-        if (str != null && !str.equals("")) {
-            // First line
-            String[] args = str.split("\\s");
-            if (args.length >= 2) {
-                parameters.put("method", args[0]);
-                parameters.put("resource", args[1]);
-                parameters.put("version", args[2]);
-            }
-
-            // Header parameters
-            str = in.readLine();
-            while (str != null && !str.equals("")) {
-                args = str.split(": ");
-                if (args.length > 1) {
-                    parameters.put(args[0], args[1]);
-                }
-                str = in.readLine();
-            }
-        }
-        
-        // Handle request
+        System.out.println("Webserver starting up on port 80");
+        System.out.println("(press ctrl-c to exit)");
         try {
-            switch (parameters.get("method")) {
-                case "GET":
-                    GETHandler(parameters.get("resource"), os);
-                    break;
-                case "POST":
-                    String bodyLine = ""; 
-                    char c; 
-                    for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
-                        c = (char) in.read();
-                        bodyLine = bodyLine + c;        
-                    }
-                    System.out.println("> " + bodyLine);
-                   /* 
-                    while(bodyLine != null && bodyLine.length() > 0){
-                        System.out.println(bodyLine);
-                        bodyLine = in.readLine();
-                    }*/
+        // create the main server socket
+        s = new ServerSocket(3000);
+        } catch (Exception e) {
+        System.out.println("Error: " + e);
+        return;
+        }
 
-                    POSTHandler(parameters.get("resource"), out, in, bodyLine);
-                    break;
-                case "HEAD":
-                    HEADHandler(parameters.get("resource"), out);
-                    break;
-                case "PUT":
-                    String body = "This is just a test";
-                    PUTHandler(parameters.get("resource"), out, body);
-                    break;
-                case "DELETE":
-                    DELETEHandler(parameters.get("resource"), out);
-                    break;
-                default:
-                    out.println("HTTP/1.0 400 Bad Request");
+        System.out.println("Waiting for connection");
+        for (;;) {
+            try {
+                // Wait for a connection
+                Socket remote = s.accept();
+
+                // Remote is now the connected socket
+                BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
+                OutputStream os = remote.getOutputStream();
+                PrintWriter out = new PrintWriter(os);
+
+                // Parse data from the header
+                Map<String, String> parameters = new HashMap<String, String>();
+
+                String str = in.readLine();
+                if (str != null && !str.equals("")) {
+                    // First line
+                    String[] args = str.split("\\s");
+                    if (args.length >= 2) {
+                        parameters.put("method", args[0]);
+                        parameters.put("resource", args[1]);
+                        parameters.put("version", args[2]);
+                    }
+
+                    // Header parameters
+                    str = in.readLine();
+                    while (str != null && !str.equals("")) {
+                        args = str.split(": ");
+                        if (args.length > 1) {
+                            parameters.put(args[0], args[1]);
+                        }
+                        str = in.readLine();
+                    }
+                }
+                
+                // Handle request
+                try {
+                    switch (parameters.get("method")) {
+                        case "GET":
+                            GETHandler(parameters.get("resource"), os);
+                            break;
+                        case "POST":
+                            String bodyLine = ""; 
+                            char c; 
+                            for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
+                                c = (char) in.read();
+                                bodyLine = bodyLine + c;        
+                            }
+                            System.out.println("> " + bodyLine);
+                        /* 
+                            while(bodyLine != null && bodyLine.length() > 0){
+                                System.out.println(bodyLine);
+                                bodyLine = in.readLine();
+                            }*/
+
+                            POSTHandler(parameters.get("resource"), out, in, bodyLine);
+                            break;
+                        case "HEAD":
+                            HEADHandler(parameters.get("resource"), out);
+                            break;
+                        case "PUT":
+                            String body = "This is just a test";
+                            PUTHandler(parameters.get("resource"), out, body);
+                            break;
+                        case "DELETE":
+                            DELETEHandler(parameters.get("resource"), out);
+                            break;
+                        default:
+                            out.println("HTTP/1.0 400 Bad Request");
+                            out.println("Content-Type: text/html");
+                            out.println("Server: Bot");
+                            out.println("");
+                            out.println("<p>Bad request (400)</p>");
+                    }
+                } catch (FileNotFoundException e) {
+                    out.println("HTTP/1.0 404 Not Found");
                     out.println("Content-Type: text/html");
                     out.println("Server: Bot");
                     out.println("");
-                    out.println("<p>Bad request (400)</p>");
+                    out.println("<p>Not found (404)</p>");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    out.println("HTTP/1.0 500 Internal Server Error");
+                    out.println("Content-Type: text/html");
+                    out.println("Server: Bot");
+                    out.println("");
+                    out.println("<p>Internal Server Error (500)</p>");
+                }
+                out.flush();
+                remote.close();
+            } catch (Exception e) {
+                System.out.println("Error: " + e);
+                e.printStackTrace();
             }
-        } catch (FileNotFoundException e) {
-            out.println("HTTP/1.0 404 Not Found");
-            out.println("Content-Type: text/html");
-            out.println("Server: Bot");
-            out.println("");
-            out.println("<p>Not found (404)</p>");
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("HTTP/1.0 500 Internal Server Error");
-            out.println("Content-Type: text/html");
-            out.println("Server: Bot");
-            out.println("");
-            out.println("<p>Internal Server Error (500)</p>");
-		}
-        out.flush();
-        remote.close();
-      } catch (Exception e) {
-        System.out.println("Error: " + e);
-        e.printStackTrace();
-      }
+        }
     }
-  }
+
     /**
      * The HTTP GET method requests a representation of the specified resource.
      * Requests using GET should only retrieve data.
      * 
      * @param resource The requested resource
+     * @param os The output stream object to write a response to
      */
     public void GETHandler(String resource, OutputStream os) throws FileNotFoundException, IOException {
 
@@ -218,6 +219,9 @@ public class WebServer {
     /**
      * The HTTP HEAD method requests the headers that would be returned if
      * the HEAD request's URL was instead requested with the HTTP GET method.
+     * 
+     * @param resource The requested resource
+     * @param out The print writer object to write a response to
      */
     public void HEADHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
         
@@ -265,16 +269,18 @@ public class WebServer {
         out.println("");
     }
 
+    /**
+     * The HTTP DELETE request method deletes the specified resource.
+     * 
+     * @param resource The requested resource
+     * @param out The print writer object to write a response to
+     */
     public void DELETEHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
 
-        /*
-            The HTTP DELETE request method deletes the specified resource.
-        */
-
-        // Displaying requested resources
+        // Display requested resources
         System.out.println("DELETE " + resource);
 
-        // Check if the file exists
+        // Check if the file exists and delete it
         File file = new File("../public" + resource);
         if (file.exists() && file.isFile() && file.delete()) {
             out.println("HTTP/1.0 204 No Content");    
@@ -285,14 +291,12 @@ public class WebServer {
             out.println("Server: Bot");
             out.println("");
         }
-
     }
     
     /**
     * Start the application.
     * 
-    * @param args
-    *            Command line parameters are not used.
+    * @param args Command line parameters are not used
     */
     public static void main(String args[]) {
         WebServer ws = new WebServer();
