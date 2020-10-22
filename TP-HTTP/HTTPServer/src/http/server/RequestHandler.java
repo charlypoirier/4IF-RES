@@ -33,6 +33,10 @@ public class RequestHandler extends Thread {
         this.output = new PrintWriter(outputStream);
     }
 
+    /**
+     * Parse header parameters and return
+     * a Map of keys and values.
+     */
     protected Map<String, String> parseParameters() throws FileNotFoundException, IOException {
         Map<String, String> parameters = new HashMap<String, String>();
         String str = input.readLine();
@@ -266,6 +270,9 @@ public class RequestHandler extends Thread {
         }
     }
 
+    /**
+     * Run the thread.
+     */
     public void run() {
         try {
             Map<String, String> parameters = parseParameters();
