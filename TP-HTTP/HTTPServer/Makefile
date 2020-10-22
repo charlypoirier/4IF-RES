@@ -12,6 +12,9 @@ server:
 client:
 	@cd bin/; java http.client.WebPing localhost 3000
 
+javadoc:
+	javadoc -d doc/ ${client_src} ${server_src}
+
 clean:
 	rm -rf bin/*
 

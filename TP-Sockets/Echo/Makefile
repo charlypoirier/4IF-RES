@@ -10,6 +10,9 @@ server:
 client:
 	@cd classes/; java stream.ChatClient 127.0.0.1 5555
 
+javadoc:
+	javadoc -d doc/ ${sources}
+
 clean:
 	rm -rf classes/*
 
