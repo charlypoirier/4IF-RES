@@ -92,27 +92,15 @@ public class WebServer {
                             GETHandler(parameters.get("resource"), os);
                             break;
                         case "POST":
-                            String bodyLine = ""; 
-                            char c; 
-                            for (int i=0; i< Integer.parseInt(parameters.get("Content-Length")) ;i++) {
-                                c = (char) in.read();
-                                bodyLine = bodyLine + c;        
-                            }
-                            System.out.println("> " + bodyLine);
-                        /* 
-                            while(bodyLine != null && bodyLine.length() > 0){
-                                System.out.println(bodyLine);
-                                bodyLine = in.readLine();
-                            }*/
-
-                            POSTHandler(parameters.get("resource"), out, in, bodyLine);
+                            int l = Integer.parseInt(parameters.get("Content-Length"));
+                            POSTHandler(parameters.get("resource"), out, in,  l);
                             break;
                         case "HEAD":
                             HEADHandler(parameters.get("resource"), out);
                             break;
                         case "PUT":
-                            String body = "This is just a test";
-                            PUTHandler(parameters.get("resource"), out, body);
+                            int l2 = Integer.parseInt(parameters.get("Content-Length"));
+                            PUTHandler(parameters.get("resource"), out, in, l2);
                             break;
                         case "DELETE":
                             DELETEHandler(parameters.get("resource"), out);
@@ -187,7 +175,7 @@ public class WebServer {
         os.flush();
     }
     
-    public void POSTHandler(String resource, PrintWriter out, BufferedReader in, String body) throws FileNotFoundException, IOException {
+    public void POSTHandler(String resource, PrintWriter out, BufferedReader in,  int length) throws FileNotFoundException, IOException {
         System.out.println("POST " + resource);
 
         
@@ -197,9 +185,15 @@ public class WebServer {
         // Example of Post request from https://www.tutorialspoint.com/http/http_methods.htm
 
         // In this lab work, we are just displaying post data.
+        char c;
+        String bodyLine = ""; 
+        System.out.println("Content length : " +length);
+        for (int i=0; i < length ;i++) {
+            c = (char) in.read();
+            bodyLine = bodyLine + c;        
+        }
 
-        System.out.println(body);
-
+        System.out.println("Parameters : " +bodyLine);
 
         
         // Sending header 
@@ -228,7 +222,7 @@ public class WebServer {
         // Displaying requested resources
         System.out.println("HEAD " + resource);
 
-        // Check if the file exists
+    // Check if the file exists
         Path path = Paths.get("../public" + resource);
         String type = Files.probeContentType(path);
         File file = new File(path.toString());
@@ -247,18 +241,26 @@ public class WebServer {
         
     }
 
-    public void PUTHandler(String filename, PrintWriter out, String body) throws FileNotFoundException, IOException {
+    public void PUTHandler(String filename,  PrintWriter  out, BufferedReader in, int length) throws FileNotFoundException, IOException {
         System.out.println("Handling a PUT Method");
     
-    
-        System.out.println(body);
+        char c; 
+        String bodyLine = ""; 
+        System.out.println("Content length : " +length);
+        for (int i=0; i < length ;i++) {
+            c = (char) in.read();
+            bodyLine = bodyLine + c;        
+        }
+
+        System.out.println("Parameters : " +bodyLine);
+
 
 
         // Write in file // for put.
         BufferedWriter outf = null; 
         FileWriter fstream = new FileWriter("out.txt", true); //true tells to append data.
         outf = new BufferedWriter(fstream);
-        outf.write(body);
+        outf.write(bodyLine);
      
         // Sending header 
         out.println("HTTP/1.0 200 OK");
