@@ -113,7 +113,7 @@ public class WebServer {
                     break;
                 case "PUT":
                     String body = "This is just a test";
-                    PUTHandler(parameters.get("ressource"), out, body);
+                    PUTHandler(parameters.get("resource"), out, body);
                     break;
                 case "DELETE":
                     DELETEHandler(parameters.get("resource"), out);
