@@ -1,24 +1,11 @@
 
 package http.server;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.FileReader;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * A web server that handles GET, HEAD, POST, PUT and DELETE
@@ -37,11 +24,11 @@ public class WebServer {
         System.out.println("Webserver starting up on port 80");
         System.out.println("(press ctrl-c to exit)");
         try {
-        // create the main server socket
-        s = new ServerSocket(3000);
+            // Create the main server socket
+            s = new ServerSocket(3000);
         } catch (Exception e) {
-        System.out.println("Error: " + e);
-        return;
+            System.out.println("Error: " + e);
+            return;
         }
 
         System.out.println("Waiting for connection");
@@ -49,6 +36,10 @@ public class WebServer {
             try {
                 // Wait for a connection
                 Socket remote = s.accept();
+
+                /**
+                 * CREATE A NEW THREAD
+                 */
 
                 // Remote is now the connected socket
                 BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
@@ -79,7 +70,8 @@ public class WebServer {
                     }
                 }
                 
-                System.out.println("Parameters : " + parameters) ;               
+                // System.out.println("\nParameters: " + parameters);
+
                 // Handle request
                 try {
                     switch (parameters.get("method")) {
@@ -136,6 +128,9 @@ public class WebServer {
      * 
      * @param resource The requested resource
      * @param os The output stream object to write a response to
+     * 
+     * @throws FileNotFoundException Thrown when the resource is not found
+     * @throws IOException Thrown on input/output errors
      */
     public void GETHandler(String resource, OutputStream os) throws FileNotFoundException, IOException {
 
@@ -171,19 +166,26 @@ public class WebServer {
     }
    
     /**
-    * The HTTP POST method sends data to the server. 
-    * The type of the body of the request is indicated by the Content-Type header. 
-    */ 
+     * The HTTP POST method sends data to the server. 
+     * The type of the body of the request is indicated by the Content-Type header. 
+     * 
+     * Example of a POST request from https://www.tutorialspoint.com/http/http_methods.htm
+     * In this lab work, we are just displaying post data.
+     * 
+     * @param resource The resource to create
+     * @param out The print writer object to write a response to
+     * @param in The body of the request
+     * @param length The length of the body
+     * @param content_type Type of the content
+     * 
+     * @throws FileNotFoundException Thrown when the resource is not found
+     * @throws IOException Thrown on input/output errors
+     */ 
     public void POSTHandler(String resource, PrintWriter out, BufferedReader in,  int length, String content_type) throws FileNotFoundException, IOException {
+       
+        // Display the requested resource
         System.out.println("POST " + resource);
 
-        
-        //POST is used to send data to a server to create/update a resource.
-        //The data sent to the server with POST is stored in the request body of the HTTP request:
-    
-        // Example of Post request from https://www.tutorialspoint.com/http/http_methods.htm
-
-        // In this lab work, we are just displaying post data.
         char c;
         String bodyLine = ""; 
         System.out.println("Content length : " +length);
@@ -191,9 +193,6 @@ public class WebServer {
             c = (char) in.read();
             bodyLine = bodyLine + c;        
         }
-
-
-
         
         Map<String, String> parameters = new HashMap<String, String>();
         String[] parameters_list = bodyLine.split("&");
@@ -205,19 +204,14 @@ public class WebServer {
                 
         System.out.println("parameters : " + parameters);
 
-
-        // Sending header 
+        // Header 
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
-        
-        //Blank line at the end of header
         out.println("");
-
 
         File rFile = new File("../public" + resource);
         boolean exist = rFile.exists();
-
     }
     
     /**
@@ -226,6 +220,9 @@ public class WebServer {
      * 
      * @param resource The requested resource
      * @param out The print writer object to write a response to
+     * 
+     * @throws FileNotFoundException Thrown when the resource is not found
+     * @throws IOException Thrown on input/output errors
      */
     public void HEADHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
         
@@ -251,8 +248,26 @@ public class WebServer {
         
     }
 
-    public void PUTHandler(String filename,  PrintWriter  out, BufferedReader in, int length) throws FileNotFoundException, IOException {
-        System.out.println("Handling a PUT Method");
+    /**
+     * The PUT method requests that the enclosed entity be stored
+     * under the supplied Request-URI.
+     * 
+     * If the Request-URI refers to an already existing resource,
+     * the enclosed entity SHOULD be considered as a modified
+     * version of the one residing on the origin server.
+     * 
+     * @param resource The resource to update
+     * @param out The print writer object to write a response to
+     * @param in The body of the request
+     * @param length The length of the body
+     * 
+     * @throws FileNotFoundException Thrown when the resource is not found
+     * @throws IOException Thrown on input/output errors
+     */
+    public void PUTHandler(String resource, PrintWriter out, BufferedReader in, int length) throws FileNotFoundException, IOException {
+        
+        // Displaying requested resources
+        System.out.println("PUT " + resource);
     
         char c; 
         String bodyLine = ""; 
@@ -265,7 +280,6 @@ public class WebServer {
         String[]  params = bodyLine.split("&");
         
         System.out.println("Parameters : " +bodyLine);
-
         
         Map<String, String> parameters = new HashMap<String, String>();
         String[] parameters_list = bodyLine.split("&");
@@ -277,7 +291,7 @@ public class WebServer {
                 
         System.out.println("parameters : " + parameters);
 
-        // Write in file // for put.
+        // Write in file
         BufferedWriter outf = null; 
         FileWriter fstream = new FileWriter("out.txt", true); //true tells to append data.
         outf = new BufferedWriter(fstream);
@@ -287,8 +301,6 @@ public class WebServer {
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
-        
-        //Blank line at the end of header
         out.println("");
     }
 
@@ -297,6 +309,9 @@ public class WebServer {
      * 
      * @param resource The requested resource
      * @param out The print writer object to write a response to
+     * 
+     * @throws FileNotFoundException Thrown when the resource is not found
+     * @throws IOException Thrown on input/output errors
      */
     public void DELETEHandler(String resource, PrintWriter out) throws FileNotFoundException, IOException {
 
