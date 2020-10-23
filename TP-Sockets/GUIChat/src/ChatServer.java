@@ -35,7 +35,7 @@ public class ChatServer  {
     private boolean keepGoing;
 
     /**
-     * Constructor with no GUI
+     * ChatServer Constructor with no GUI
      * 
      * @param port an integer representing the port
      */
@@ -44,7 +44,7 @@ public class ChatServer  {
     }
 
     /**
-     * Constructor with GUI
+     * ChatServer Constructor with GUI
      * 
      * @param port an integer representing the port
      * @param sg a ServerGUI object for the chat interface
@@ -213,7 +213,7 @@ public class ChatServer  {
         String date;
 
         /**
-         * Constructor
+         * ClientThread Constructor
          * 
          * @param socket the communication socket
          */

@@ -30,7 +30,8 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private String defaultHost;
 
     /**
-     * Constructor connection receiving a socket number
+     * ClientGUI Constructor connection receiving
+     * a socket number
      */
 	ClientGUI(String host, int port) {
 
@@ -212,5 +213,3 @@ public class ClientGUI extends JFrame implements ActionListener {
 		new ClientGUI("localhost", 1500);
 	}
 }
-
-

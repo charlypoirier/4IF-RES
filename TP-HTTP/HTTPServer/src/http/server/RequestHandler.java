@@ -22,7 +22,7 @@ public class RequestHandler extends Thread {
     private PrintWriter output;
 
     /**
-     * Constructor
+     * RequestHandler Constructor
      * 
      * @param remote BufferedReader
      */

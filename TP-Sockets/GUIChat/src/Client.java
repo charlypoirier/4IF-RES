@@ -24,7 +24,7 @@ public class Client  {
 	private int port;
 
 	/**
-	 * Constructor called by console mode
+	 * Client Constructor called by console mode
      * 
 	 * @param server the server address
 	 * @param port the port number
@@ -36,7 +36,7 @@ public class Client  {
 	}
 
 	/**
-	 * Constructor call when used from a GUI
+	 * Client Constructor call when used from a GUI
 	 * in console mode the ClienGUI parameter is null
 	 */
 	Client(String server, int port, String username, ClientGUI cg) {

@@ -17,7 +17,7 @@ public class MessageListener extends Thread {
 	private BufferedReader input;
 
     /**
-     * Constructor
+     * MessageListener Constructor
      * 
      * @param input BufferedReader
      */
