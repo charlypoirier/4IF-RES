@@ -299,7 +299,7 @@ public class ChatServer  {
                     display(username + " request chat history with a HISTORY message.");
                     writeMsg("Chat history since server startup : \n");
                     for(int i=0; i<ml.size(); ++i) {
-                        writeMsg(ml.get(i) + "\n");
+                        writeMsg("> " +ml.get(i) + "\n");
                     }
                     break;
                 }
