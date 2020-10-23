@@ -143,6 +143,7 @@ public class RequestHandler extends Thread {
      * In this lab work, we are just displaying post data.
      * 
      * @param resource The resource to create
+     * @param os The output stream object to write a response to
      * @param out The print writer object to write a response to
      * @param in The body of the request
      * @param length The length of the body
