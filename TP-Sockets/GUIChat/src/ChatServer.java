@@ -104,7 +104,7 @@ public class ChatServer  {
             new Socket("localhost", port);
         }
         catch(Exception e) {
-            // nothing I can really do
+            // nothing to  do
         }
     }
 
@@ -131,10 +131,8 @@ public class ChatServer  {
         if(sg == null)
             System.out.print(messageLf);
         else
-            sg.appendRoom(messageLf); // append in the room window
+            sg.appendRoom(messageLf); 
 
-        // we loop in reverse order in case we would have to remove a Client
-        // because it has disconnected
         for(int i = al.size(); --i >= 0;) {
             ClientThread ct = al.get(i);
             // try to write to the Client if it fails remove it from the list
@@ -202,7 +200,7 @@ public class ChatServer  {
         ObjectInputStream sInput;
         ObjectOutputStream sOutput;
         
-        // my unique id (easier for deconnection)
+        // my unique id (used for deconnection)
         int id;
 
         // the Username of the Client
@@ -241,7 +239,6 @@ public class ChatServer  {
                 return;
             }
             // have to catch ClassNotFoundException
-            // but I read a String, I am sure it will work
             catch (ClassNotFoundException e) {
             }
             date = new Date().toString() + "\n";
@@ -289,7 +286,7 @@ public class ChatServer  {
                     break;
                 case ChatMessage.WHOISIN:
                     writeMsg("List of the users connected at " + sdf.format(new Date()) + "\n");
-                    // scan al the users connected
+                    // scan all the users connected
                     for(int i = 0; i < al.size(); ++i) {
                         ClientThread ct = al.get(i);
                         writeMsg((i+1) + ") " + ct.username + " since " + ct.date);
