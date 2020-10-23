@@ -10,7 +10,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * Thread that handle communication with a client
+ * Thread that handles communication with a client
  */
 public class ClientThread extends Thread {
 	
@@ -20,7 +20,7 @@ public class ClientThread extends Thread {
     static int nbClients;
 
     /**
-     * Constructor
+     * ClientThread Constructor
      *
      * @param s A communication socket
      */
@@ -62,7 +62,6 @@ public class ClientThread extends Thread {
                 FileWriter fwriter = new FileWriter("history.txt", true);
                 fwriter.write(message + "\n");
                 fwriter.close();
-
 
                 System.out.println("Messages in chat history : "+ ChatServer.history.size());
 

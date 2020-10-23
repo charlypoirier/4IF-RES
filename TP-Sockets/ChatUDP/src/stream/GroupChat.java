@@ -2,6 +2,11 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+/**
+ * GroupChat class
+ * 
+ * A multicast chat application
+ */
 public class GroupChat
 {
     private static final String TERMINATE = "Exit";

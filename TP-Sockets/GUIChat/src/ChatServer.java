@@ -10,6 +10,10 @@ import java.net.*;
 import java.util.*;
 import java.text.*;
 
+/**
+ * Server main file for the
+ * GUI Chat application
+ */
 public class ChatServer  {
 
     static ClientThread[] listCT = new ClientThread[100];
@@ -30,13 +34,21 @@ public class ChatServer  {
     // the boolean that will be turned of to stop the server
     private boolean keepGoing;
 
-
-    // Constructor without GUI
+    /**
+     * ChatServer Constructor with no GUI
+     * 
+     * @param port an integer representing the port
+     */
     public ChatServer(int port) {
         this(port, null);
     }
 
-    // Constructor with GUI
+    /**
+     * ChatServer Constructor with GUI
+     * 
+     * @param port an integer representing the port
+     * @param sg a ServerGUI object for the chat interface
+     */
     public ChatServer(int port, ServerGUI sg) {
         // GUI or not
         this.sg = sg;
@@ -50,10 +62,11 @@ public class ChatServer  {
         ml = new ArrayList<String>();
         // Keep going
         this.keepGoing = true;
-        
     }
 
-    // Start the server
+    /**
+     * Starts the server
+     */
     public void start() {
         try {
             // Create a server socket associated with the server port
@@ -63,29 +76,24 @@ public class ChatServer  {
             display("Server ready on port : "+ port + "." +keepGoing);
             
             while(keepGoing) {
-                
                 // Server waits for a connection
                 Socket socket  = serverSocket.accept();
 
                 if (!keepGoing) {
                     break; 
-            }
+                }
 
                 // Spawn a thread for new client
                 ClientThread t = new ClientThread(socket);
                 al.add(t); 
                 t.start();
             }
-
-
         } catch (Exception e) {
             display("Error while running server");
         }
-    
-    
     }
 
-    /*
+    /**
      * For the GUI to stop the server
      */
     protected void stop() {
@@ -100,15 +108,20 @@ public class ChatServer  {
         }
     }
 
+    /**
+     * Displays a message on the GUI
+     * or terminal
+     */
     private void display(String msg) {
-         String time = sdf.format(new Date()) + " " + msg;
-         if(sg == null)
-             System.out.println(time);
-         else 
+        String time = sdf.format(new Date()) + " " + msg;
+        if(sg == null)
+            System.out.println(time);
+        else 
             sg.appendEvent(time + "\n");
-     }
-    /*
-     *  to broadcast a message to all Clients
+    }
+
+    /**
+     * Broadcasts a message to all Clients
      */
     private synchronized void broadcast(String message) {
         // add HH:mm:ss and \n to the message
@@ -118,7 +131,7 @@ public class ChatServer  {
         if(sg == null)
             System.out.print(messageLf);
         else
-            sg.appendRoom(messageLf);     // append in the room window
+            sg.appendRoom(messageLf); // append in the room window
 
         // we loop in reverse order in case we would have to remove a Client
         // because it has disconnected
@@ -132,55 +145,57 @@ public class ChatServer  {
         }
     }
 
-    // for a client who logoff using the LOGOUT message
+    /**
+     * Removes a logged off Client from the list
+     * 
+     * @param id Client ID to be removed
+     */
     synchronized void remove(int id) {
         // scan the array list until we found the Id
         for(int i = 0; i < al.size(); ++i) {
-            
             ClientThread ct = al.get(i);
-            
             // found it
             if(ct.id == id) {
-                 al.remove(i);
-                 return;
+                al.remove(i);
+                return;
             }
         }
     }    
 
-
  	/**
-  	* main method
-	* @param ChatServer port
-  	* 
+     * Main method
+     * 
+	 * @param args command line arguments (port)
   	**/
     public static void main(String args[]){ 
         ServerSocket listenSocket;
-        // start server on port 1500 unless a PortNumber is specified
+        // Start server on port 1500 unless a PortNumber is specified
         int portNumber = 1500;
             switch(args.length) {
              case 1:
-                 try {
-                     portNumber = Integer.parseInt(args[0]);
-                 }
-                 catch(Exception e) {
-                     System.out.println("Invalid port number.");
-                     System.out.println("Usage is: > java Server [portNumber]");
-                     return;
-                 }
+                try {
+                    portNumber = Integer.parseInt(args[0]);
+                }
+                catch(Exception e) {
+                    System.out.println("Invalid port number.");
+                    System.out.println("Usage is: > java Server [portNumber]");
+                    return;
+                }
              case 0:
-                 break;
+                break;
              default:
-                 System.out.println("Usage is: > java Server [portNumber]");
+                System.out.println("Usage is: > java Server [portNumber]");
                 return;
-
             }
 
-         // create a server object and start it
-         ChatServer server = new ChatServer(portNumber);
-         server.start();
+        // Create a server object and start it
+        ChatServer server = new ChatServer(portNumber);
+        server.start();
     }
 
-    /** One instance of this thread will run for each client */
+    /**
+     * One instance of this thread will run for each client
+     */
     class ClientThread extends Thread {
         // the socket where to listen/talk
         Socket socket;
@@ -197,14 +212,20 @@ public class ChatServer  {
         // the date I connect
         String date;
 
-        // Constructor
+        /**
+         * ClientThread Constructor
+         * 
+         * @param socket the communication socket
+         */
         ClientThread(Socket socket) {
             
             // a unique id
             id = ++uniqueId;
             this.socket = socket;
             
-            /* Creating both Data Stream */
+            /**
+             * Creating both Data Stream
+             */
             System.out.println("Thread trying to create Object Input/Output Streams");
             try
             {
@@ -225,8 +246,11 @@ public class ChatServer  {
             }
             date = new Date().toString() + "\n";
         }
-  	    
-        // what will run forever
+          
+        /**
+         * Starts the thread and runs
+         * until the client disconnects
+         */
         public void run() {
             // to loop until LOGOUT
             boolean keepGoing = true;
@@ -281,32 +305,29 @@ public class ChatServer  {
                 }
             }
 
-
             // remove myself from the arrayList containing the list of the
             // connected Clients
             remove(id);
             close();
         }
 
-        // try to close everything
+        /**
+         * Close remote connection
+         */
         private void close() {
-            // try to close the connection
             try {
                 if(sOutput != null) sOutput.close();
-            }
-            catch(Exception e) {}
-            try {
                 if(sInput != null) sInput.close();
-            }
-            catch(Exception e) {};
-            try {
                 if(socket != null) socket.close();
+            } catch (Exception e) {
+                System.out.println(e);
             }
-            catch (Exception e) {}
         }
 
-        /*
-         * Write a String to the Client output stream
+        /**
+         * Writes a String to the Client output stream
+         * 
+         * @param msg a string object to be written
          */
         private boolean writeMsg(String msg) {
             // if Client is still connected send the message to it
@@ -314,7 +335,7 @@ public class ChatServer  {
                 close();
                 return false;
             }
-            // write the message to the stream
+            // Write the message to the stream
             try {
                 sOutput.writeObject(msg);
             }

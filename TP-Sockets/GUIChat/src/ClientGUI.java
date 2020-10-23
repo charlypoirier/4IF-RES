@@ -5,10 +5,9 @@ import java.awt.event.*;
 
 // GUI from https://www.dreamincode.net/forums/topic/259777-a-simple-chat-program-with-clientserver-gui-optional/
 
-/*
+/**
  * The Client with its GUI
  */
-
 public class ClientGUI extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -30,7 +29,10 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private int defaultPort;
 	private String defaultHost;
 
-	// Constructor connection receiving a socket number
+    /**
+     * ClientGUI Constructor connection receiving
+     * a socket number
+     */
 	ClientGUI(String host, int port) {
 
 		super("Chat Client");
@@ -93,16 +95,22 @@ public class ClientGUI extends JFrame implements ActionListener {
 		setSize(600, 600);
 		setVisible(true);
 		tf.requestFocus();
-
 	}
 
-	// called by the Client to append text in the TextArea 
+    /**
+     * Called by the Client to append text in the TextArea
+     * 
+     * @param str string object to append
+     */
 	void append(String str) {
 		ta.append(str);
 		ta.setCaretPosition(ta.getText().length() - 1);
-	}
-	// called by the GUI is the connection failed
-	// we reset our buttons, label, textfield
+    }
+    
+    /**
+     * Called by the GUI if the connection failed
+	 * we reset our buttons, label, textfield
+     */
 	void connectionFailed() {
 		login.setEnabled(true);
 		logout.setEnabled(false);
@@ -121,9 +129,11 @@ public class ClientGUI extends JFrame implements ActionListener {
 		connected = false;
 	}
 		
-	/*
-	* Button or JTextField clicked
-	*/
+	/**
+     * Button or JTextField clicked
+     * 
+     * @param e ActionEvent event object
+	 */
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		// if it is the Logout button
@@ -149,7 +159,6 @@ public class ClientGUI extends JFrame implements ActionListener {
 			return;
 		}
 		
-
 		if(o == login) {
 			// ok it is a connection request
 			String username = tf.getText().trim();
@@ -193,14 +202,14 @@ public class ClientGUI extends JFrame implements ActionListener {
 			// Action listener for when the user enter a message
 			tf.addActionListener(this);
 		}
-
 	}
 
-	// to start the whole thing the server
+    /**
+     * Starts the server
+     * 
+     * @param args command line agruments
+     */
 	public static void main(String[] args) {
 		new ClientGUI("localhost", 1500);
 	}
-
 }
-
-

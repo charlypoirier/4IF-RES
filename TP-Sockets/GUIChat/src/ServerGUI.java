@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-/*
+/**
  * The server as a GUI
  */
 public class ServerGUI extends JFrame implements ActionListener, WindowListener {
@@ -21,8 +21,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
     // my server
 	private ChatServer server;
 	
-	
-	// server constructor that receive the port to listen to for connection as parameter
+    /**
+     * Server constructor
+     * 
+     * Receives the port to listen
+     * to for connection as parameter
+     */
 	ServerGUI(int port) {
 		
         super("Chat Server");
@@ -54,10 +58,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		addWindowListener(this);
 		setSize(400, 600);
 		setVisible(true);
-	}		
+    }
 
-	// append message to the two JTextArea
-	// position at the end
+    /**
+     * Appends a message to the two JTextArea
+     * position at the end
+     */
 	void appendRoom(String str) {
 		chat.append(str);
 		chat.setCaretPosition(chat.getText().length() - 1);
@@ -68,7 +74,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		
 	}
 	
-	// start or stop where clicked
+    /**
+     * Start or stop where clicked
+     */
 	public void actionPerformed(ActionEvent e) {
 		// if running we have to stop
 		if(server != null) {
@@ -99,8 +107,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		tPortNumber.setEditable(false);
 	}
 	
-
-	/*
+	/**
 	 * If the user click the X button to close the application
 	 * I need to close the connection with the server to free the port
 	 */
@@ -119,7 +126,6 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		System.exit(0);
 	}
 
-
 	// I can ignore the other WindowListener method
 	public void windowClosed(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}
@@ -128,12 +134,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 	public void windowActivated(WindowEvent e) {}
 	public void windowDeactivated(WindowEvent e) {}
 
-	/*
+	/**
 	 * A thread to run the Server
 	 */
 	class ServerRunning extends Thread {
 		public void run() {
-			server.start();         // should execute until if fails
+			server.start(); // should execute until if fails
 			// the server failed
 			stopStart.setText("Start");
 			tPortNumber.setEditable(true);
@@ -142,10 +148,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener 
 		}
 	}
 
-
-    
-	// entry point to start the Server
-	public static void main(String[] arg) {
+    /**
+     * Main method
+     * 
+     * @param args command line agruments
+     */
+	public static void main(String[] args) {
 		// start server default port 1500
 		new ServerGUI(1500);
 	}
