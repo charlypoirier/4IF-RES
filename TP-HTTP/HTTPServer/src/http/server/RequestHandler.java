@@ -76,7 +76,7 @@ public class RequestHandler extends Thread {
         if (str != null && !str.equals("")) {
             // First line
             String[] args = str.split("\\s");
-            if (args.length >= 2) {
+            if (args.length == 3) {
                 parameters.put("method", args[0]);
                 parameters.put("resource", args[1]);
                 parameters.put("version", args[2]);
@@ -143,6 +143,7 @@ public class RequestHandler extends Thread {
      * In this lab work, we are just displaying post data.
      * 
      * @param resource The resource to create
+     * @param os The output stream object to write a response to
      * @param out The print writer object to write a response to
      * @param in The body of the request
      * @param length The length of the body
@@ -328,27 +329,30 @@ public class RequestHandler extends Thread {
     public void run() {
         try {
             Map<String, String> parameters = parseParameters();
-            switch (parameters.get("method")) {
-                case "GET":
-                    GETHandler(parameters.get("resource"), outputStream);
-                    break;
-                case "POST":
-                    int l = Integer.parseInt(parameters.get("Content-Length"));
-                    POSTHandler(parameters.get("resource"), outputStream, output, input,  l, parameters.get("Content-Type"));
-                    break;
-                case "HEAD":
-                    HEADHandler(parameters.get("resource"), output);
-                    break;
-                case "PUT":
-                    int l2 = Integer.parseInt(parameters.get("Content-Length"));
-                    PUTHandler(parameters.get("resource"), output, input, l2, parameters.get("Content-Type"));
-                    break;
-                case "DELETE":
-                    DELETEHandler(parameters.get("resource"), output);
-                    break;
-                default:
-                    output.println(getHeader(400, "text/html"));
-                    output.println("<p>Bad request (400)</p>");
+            String method = parameters.get("method");
+            if (method != null) {
+                switch (parameters.get("method")) {
+                    case "GET":
+                        GETHandler(parameters.get("resource"), outputStream);
+                        break;
+                    case "POST":
+                        int l = Integer.parseInt(parameters.get("Content-Length"));
+                        POSTHandler(parameters.get("resource"), outputStream, output, input,  l, parameters.get("Content-Type"));
+                        break;
+                    case "HEAD":
+                        HEADHandler(parameters.get("resource"), output);
+                        break;
+                    case "PUT":
+                        int l2 = Integer.parseInt(parameters.get("Content-Length"));
+                        PUTHandler(parameters.get("resource"), output, input, l2, parameters.get("Content-Type"));
+                        break;
+                    case "DELETE":
+                        DELETEHandler(parameters.get("resource"), output);
+                        break;
+                    default:
+                        output.println(getHeader(400, "text/html"));
+                        output.println("<p>Bad request (400)</p>");
+                    }
             }
         } catch (FileNotFoundException e) {
             output.println(getHeader(404, "text/html"));
