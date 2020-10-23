@@ -98,13 +98,13 @@ public class ChatServer  {
      */
     protected void stop() {
         keepGoing = false;
-        // connect to myself as Client to exit statement
+        // connect to myself as Client to reach exit statement
         // Socket socket = serverSocket.accept();
         try {
             new Socket("localhost", port);
         }
         catch(Exception e) {
-            // nothing to  do
+            // display error
         }
     }
 
@@ -122,21 +122,24 @@ public class ChatServer  {
 
     /**
      * Broadcasts a message to all Clients
+     * synchronized method
      */
     private synchronized void broadcast(String message) {
         // add HH:mm:ss and \n to the message
         String time = sdf.format(new Date());
-        String messageLf = time + " " + message + "\n";
+        String e_message = time + " " + message + "\n";
+        
         // display message on console or GUI
         if(sg == null)
-            System.out.print(messageLf);
+            System.out.print(e_message);
         else
-            sg.appendRoom(messageLf); 
+            sg.appendRoom(e_message); 
 
-        for(int i = al.size(); --i >= 0;) {
+        for(int i = al.size()-1; i >= 0; --i) {
+            // get Client
             ClientThread ct = al.get(i);
             // try to write to the Client if it fails remove it from the list
-            if(!ct.writeMsg(messageLf)) {
+            if(!ct.writeMsg(e_message)) {
                 al.remove(i);
                 display("Disconnected Client " + ct.username + " removed from list.");
             }
@@ -176,13 +179,13 @@ public class ChatServer  {
                 }
                 catch(Exception e) {
                     System.out.println("Invalid port number.");
-                    System.out.println("Usage is: > java Server [portNumber]");
+                    System.out.println("Usage : java Server [portNumber]");
                     return;
                 }
              case 0:
                 break;
              default:
-                System.out.println("Usage is: > java Server [portNumber]");
+                System.out.println("Usage : java Server [portNumber]");
                 return;
             }
 
