@@ -208,9 +208,7 @@ public class RequestHandler extends Thread {
             os.write(buffer, 0, size);
         } 
         input.close();
-        os.flush(); 
-
-    
+        os.flush();
     }
     
     /**
@@ -228,7 +226,7 @@ public class RequestHandler extends Thread {
         // Displaying requested resources
         System.out.println("HEAD " + resource);
 
-    // Check if the file exists
+        // Check if the file exists
         Path path = Paths.get("../public" + resource);
         String type = Files.probeContentType(path);
         File file = new File(path.toString());
@@ -244,7 +242,6 @@ public class RequestHandler extends Thread {
             out.println("Server: Bot");
             out.println("");
         }
-        
     }
 
     /**
