@@ -137,17 +137,23 @@ public class RequestHandler extends Thread {
             c = (char) in.read();
             bodyLine = bodyLine + c;        
         }
+       
+        if(content_type.equals("application/x-www-form-urlencoded")) { 
+            Map<String, String> parameters = new HashMap<String, String>();
+            String[] parameters_list = bodyLine.split("&");
         
-        Map<String, String> parameters = new HashMap<String, String>();
-        String[] parameters_list = bodyLine.split("&");
-        
-        for(int i=0; i< parameters_list.length; i++) {
-            String[] p = parameters_list[i].split("=");
-            parameters.put(p[0],p[1]);        
-        }
-                
-        System.out.println("parameters : " + parameters);
+            for(int i=0; i< parameters_list.length; i++) {
+                String[] p = parameters_list[i].split("=");
+                parameters.put(p[0],p[1]);        
+            }
 
+                
+            System.out.println("parameters : " + parameters);
+        }
+        else {
+            System.out.println(bodyLine);
+        
+        }
         // Header 
         out.println("HTTP/1.0 200 OK");
         out.println("Content-Type: text/html");
@@ -237,7 +243,7 @@ public class RequestHandler extends Thread {
 
         // Write in file
         BufferedWriter outf = null; 
-        FileWriter fstream = new FileWriter("out.txt", true); //true tells to append data.
+        FileWriter fstream = new FileWriter("../public/out.txt", true); //true tells to append data.
         outf = new BufferedWriter(fstream);
         outf.write(bodyLine);
      
