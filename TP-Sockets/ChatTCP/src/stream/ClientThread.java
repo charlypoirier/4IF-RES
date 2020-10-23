@@ -63,7 +63,6 @@ public class ClientThread extends Thread {
                 fwriter.write(message + "\n");
                 fwriter.close();
 
-
                 System.out.println("Messages in chat history : "+ ChatServer.history.size());
 
                 // Send message to everyone 

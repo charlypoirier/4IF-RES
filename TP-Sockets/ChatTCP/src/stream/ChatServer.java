@@ -11,7 +11,9 @@ import java.net.*;
 import java.util.*;
 
 /**
- * Server class for the TCP chat
+ * ChatServer class
+ * 
+ * Server-side TCP chat application
  */
 public class ChatServer  {
 

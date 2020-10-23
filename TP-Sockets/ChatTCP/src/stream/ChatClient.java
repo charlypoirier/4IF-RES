@@ -10,7 +10,9 @@ import java.io.*;
 import java.net.*;
 
 /**
- * Client class for the TCP chat
+ * ChatClient class
+ * 
+ * Client-side TCP chat application
  */
 public class ChatClient {
  
