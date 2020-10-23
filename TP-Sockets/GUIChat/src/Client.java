@@ -217,6 +217,9 @@ public class Client  {
 			else if(msg.equalsIgnoreCase("WHOISIN")) {
 				client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));				
 			}
+            else if (msg.equalsIgnoreCase("HISTORY")) {
+                client.sendMessage(new ChatMessage(ChatMessage.HISTORY, ""));				
+            }
 			else {				// default to ordinary message
 				client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
 			}
