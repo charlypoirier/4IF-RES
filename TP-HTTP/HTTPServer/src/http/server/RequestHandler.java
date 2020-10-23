@@ -345,30 +345,33 @@ public class RequestHandler extends Thread {
     public void run() {
         try {
             Map<String, String> parameters = parseParameters();
-            switch (parameters.get("method")) {
-                case "GET":
-                    GETHandler(parameters.get("resource"), outputStream);
-                    break;
-                case "POST":
-                    int l = Integer.parseInt(parameters.get("Content-Length"));
-                    POSTHandler(parameters.get("resource"), outputStream, output, input,  l, parameters.get("Content-Type"));
-                    break;
-                case "HEAD":
-                    HEADHandler(parameters.get("resource"), output);
-                    break;
-                case "PUT":
-                    int l2 = Integer.parseInt(parameters.get("Content-Length"));
-                    PUTHandler(parameters.get("resource"), output, input, l2, parameters.get("Content-Type"));
-                    break;
-                case "DELETE":
-                    DELETEHandler(parameters.get("resource"), output);
-                    break;
-                default:
-                    output.println("HTTP/1.0 400 Bad Request");
-                    output.println("Content-Type: text/html");
-                    output.println("Server: Bot");
-                    output.println("");
-                    output.println("<p>Bad request (400)</p>");
+            String method = parameters.get("method");
+            if (method != null) {
+                switch (parameters.get("method")) {
+                    case "GET":
+                        GETHandler(parameters.get("resource"), outputStream);
+                        break;
+                    case "POST":
+                        int l = Integer.parseInt(parameters.get("Content-Length"));
+                        POSTHandler(parameters.get("resource"), outputStream, output, input,  l, parameters.get("Content-Type"));
+                        break;
+                    case "HEAD":
+                        HEADHandler(parameters.get("resource"), output);
+                        break;
+                    case "PUT":
+                        int l2 = Integer.parseInt(parameters.get("Content-Length"));
+                        PUTHandler(parameters.get("resource"), output, input, l2, parameters.get("Content-Type"));
+                        break;
+                    case "DELETE":
+                        DELETEHandler(parameters.get("resource"), output);
+                        break;
+                    default:
+                        output.println("HTTP/1.0 400 Bad Request");
+                        output.println("Content-Type: text/html");
+                        output.println("Server: Bot");
+                        output.println("");
+                        output.println("<p>Bad request (400)</p>");
+                }
             }
         } catch (FileNotFoundException e) {
             output.println("HTTP/1.0 404 Not Found");
