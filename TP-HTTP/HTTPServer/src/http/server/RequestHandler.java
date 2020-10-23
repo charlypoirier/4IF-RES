@@ -33,7 +33,12 @@ public class RequestHandler extends Thread {
         this.output = new PrintWriter(outputStream);
     }
 
-
+    /**
+     * Build a header and returns it
+     * 
+     * @param code status code
+     * @param type content-type
+     */
     private String getHeader(int code, String type ) {
 
         String message = new String();
