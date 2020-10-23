@@ -134,15 +134,14 @@ public class RequestHandler extends Thread {
         }
        
         if(content_type.equals("application/x-www-form-urlencoded")) { 
+            
             Map<String, String> parameters = new HashMap<String, String>();
             String[] parameters_list = bodyLine.split("&");
         
             for(int i=0; i< parameters_list.length; i++) {
                 String[] p = parameters_list[i].split("=");
                 parameters.put(p[0],p[1]);        
-            }
-
-                
+            }    
             System.out.println("parameters : " + parameters);
         }
         else {
@@ -209,7 +208,7 @@ public class RequestHandler extends Thread {
      * @throws FileNotFoundException Thrown when the resource is not found
      * @throws IOException Thrown on input/output errors
      */
-    public void PUTHandler(String resource, PrintWriter out, BufferedReader in, int length) throws FileNotFoundException, IOException {
+    public void PUTHandler(String resource, PrintWriter out, BufferedReader in, int length, String content_type) throws FileNotFoundException, IOException {
         
         // Displaying requested resources
         System.out.println("PUT " + resource);
@@ -220,27 +219,34 @@ public class RequestHandler extends Thread {
         for (int i=0; i < length ;i++) {
             c = (char) in.read();
             bodyLine = bodyLine + c;        
+        } 
+          
+        if(content_type.equals("application/x-www-form-urlencoded")) { 
+            
+            Map<String, String> parameters = new HashMap<String, String>();
+            String[] parameters_list = bodyLine.split("&");
+        
+            for(int i=0; i< parameters_list.length; i++) {
+                String[] p = parameters_list[i].split("=");
+                parameters.put(p[0],p[1]);        
+            }    
+            System.out.println("parameters : " + parameters);
         }
+        else {
+            System.out.println(bodyLine);
+        
+        }       
 
-        String[]  params = bodyLine.split("&");
+        // Write in file;
+        byte[] buffer = bodyLine.getBytes();
+    
+        // Creating the file 
+        File f = new File("../public/out.txt"); 
+        BufferedOutputStream fOut = new BufferedOutputStream(new FileOutputStream(f)); 
         
-        System.out.println("Parameters : " +bodyLine);
-        
-        Map<String, String> parameters = new HashMap<String, String>();
-        String[] parameters_list = bodyLine.split("&");
-        
-        for(int i=0; i< parameters_list.length; i++) {
-            String[] p = parameters_list[i].split("=");
-            parameters.put(p[0],p[1]);        
-        }
-                
-        System.out.println("parameters : " + parameters);
-
-        // Write in file
-        BufferedWriter outf = null; 
-        FileWriter fstream = new FileWriter("../public/out.txt", true); //true tells to append data.
-        outf = new BufferedWriter(fstream);
-        outf.write(bodyLine);
+        // Writing in it
+        fOut.write(buffer, 0, buffer.length);
+        fOut.flush();
      
         // Sending header 
         out.println("HTTP/1.0 200 OK");
@@ -295,7 +301,7 @@ public class RequestHandler extends Thread {
                     break;
                 case "PUT":
                     int l2 = Integer.parseInt(parameters.get("Content-Length"));
-                    PUTHandler(parameters.get("resource"), output, input, l2);
+                    PUTHandler(parameters.get("resource"), output, input, l2, parameters.get("Content-Type"));
                     break;
                 case "DELETE":
                     DELETEHandler(parameters.get("resource"), output);
