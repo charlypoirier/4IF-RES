@@ -209,6 +209,7 @@ public class RequestHandler extends Thread {
      * @param out The print writer object to write a response to
      * @param in The body of the request
      * @param length The length of the body
+     * @param content_type The type of content
      * 
      * @throws FileNotFoundException Thrown when the resource is not found
      * @throws IOException Thrown on input/output errors
