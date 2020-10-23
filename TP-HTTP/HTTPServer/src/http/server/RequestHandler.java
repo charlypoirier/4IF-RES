@@ -33,6 +33,32 @@ public class RequestHandler extends Thread {
         this.output = new PrintWriter(outputStream);
     }
 
+
+    private String getHeader(int code, String type ) {
+
+        String message = new String();
+        // Finding response code
+        switch(code) {
+            case 200:
+                message = "OK";             break;
+            case 400:
+                message = "Bad Request";    break;
+            case 404:
+                message = "Not Found";      break; 
+            case 500:  
+                message = "Internal Server Error";
+                break;
+        }
+
+        String header = "HTTP/1.0 "+ code + " " + message + "\n";
+        header = header +  "Content-Type: " + type + "\n";
+        header = header + "Server: Bot\n";
+        header = header + "\n";
+    
+        return header;
+    
+    } 
+        
     /**
      * Parse header parameters and return
      * a Map of keys and values.
@@ -93,10 +119,8 @@ public class RequestHandler extends Thread {
         BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
         
         // Header
-        os.write("HTTP/1.0 200 OK\n".getBytes());
-        os.write(("Content-Type: " + type + "\n").getBytes());
-        os.write("Server: Bot\n".getBytes());
-        os.write("\n".getBytes());
+        String h = getHeader(200, type);
+        os.write(h.getBytes());
 
         // Body
         int size;
@@ -150,8 +174,7 @@ public class RequestHandler extends Thread {
             System.out.println("parameters : " + parameters);
         }
         else {
-            System.out.println(bodyLine);
-        
+            System.out.println(bodyLine); 
         }
         // Header 
          //out.println("HTTP/1.0 200 OK");
