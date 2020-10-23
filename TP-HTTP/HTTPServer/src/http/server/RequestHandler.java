@@ -125,7 +125,7 @@ public class RequestHandler extends Thread {
      * @throws FileNotFoundException Thrown when the resource is not found
      * @throws IOException Thrown on input/output errors
      */ 
-    public void POSTHandler(String resource, PrintWriter out, BufferedReader in,  int length, String content_type) throws FileNotFoundException, IOException {
+    public void POSTHandler(String resource, OutputStream os, PrintWriter out, BufferedReader in,  int length, String content_type) throws FileNotFoundException, IOException {
        
         // Display the requested resource
         System.out.println("POST " + resource);
@@ -154,13 +154,40 @@ public class RequestHandler extends Thread {
         
         }
         // Header 
-        out.println("HTTP/1.0 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        out.println("");
+         //out.println("HTTP/1.0 200 OK");
+         //out.println("Content-Type: text/html");
+         //out.println("Server: Bot");
+         //out.println("");
+       
 
-        File rFile = new File("../public" + resource);
-        boolean exist = rFile.exists();
+        
+        // Open the resource
+        if (resource.equals("/")) resource = "/index.html";
+        Path path = Paths.get("../public" + resource);
+        File file = new File(path.toString());
+         
+        String type = Files.probeContentType(path);
+        if (type == null) type = "text/html";
+        
+        os.write("HTTP/1.0 200 OK\n".getBytes());
+        os.write(("Content-Type: text/html" + "\n").getBytes());
+        os.write("Server: Bot\n".getBytes());
+        os.write("\n".getBytes());
+        
+        
+        // Body
+
+        // Fetch file type
+        BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
+        int size;
+        byte[] buffer = new byte[256];
+        while((size = input.read(buffer)) != -1) {
+            os.write(buffer, 0, size);
+        } 
+        input.close();
+        os.flush(); 
+
+    
     }
     
     /**
@@ -217,7 +244,11 @@ public class RequestHandler extends Thread {
         
         // Displaying requested resources
         System.out.println("PUT " + resource);
-    
+        if(resource.equals("/")) {
+            System.out.println("Empty resource, writing in out.txt");
+            resource = "/out.txt";
+        } 
+         
         char c; 
         String bodyLine = ""; 
         System.out.println("Content length : " +length);
@@ -246,7 +277,7 @@ public class RequestHandler extends Thread {
         byte[] buffer = bodyLine.getBytes();
     
         // Creating the file 
-        File f = new File("../public/out.txt"); 
+        File f = new File("../public" +resource); 
         BufferedOutputStream fOut = new BufferedOutputStream(new FileOutputStream(f)); 
         
         // Writing in it
@@ -299,7 +330,7 @@ public class RequestHandler extends Thread {
                     break;
                 case "POST":
                     int l = Integer.parseInt(parameters.get("Content-Length"));
-                    POSTHandler(parameters.get("resource"), output, input,  l, parameters.get("Content-Type"));
+                    POSTHandler(parameters.get("resource"), outputStream, output, input,  l, parameters.get("Content-Type"));
                     break;
                 case "HEAD":
                     HEADHandler(parameters.get("resource"), output);
