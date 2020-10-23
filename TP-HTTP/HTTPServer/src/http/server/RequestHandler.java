@@ -41,6 +41,8 @@ public class RequestHandler extends Thread {
         switch(code) {
             case 200:
                 message = "OK";             break;
+            case 204:
+                message = "No Content";     break;
             case 400:
                 message = "Bad Request";    break;
             case 404:
@@ -176,14 +178,7 @@ public class RequestHandler extends Thread {
         else {
             System.out.println(bodyLine); 
         }
-        // Header 
-         //out.println("HTTP/1.0 200 OK");
-         //out.println("Content-Type: text/html");
-         //out.println("Server: Bot");
-         //out.println("");
        
-
-        
         // Open the resource
         if (resource.equals("/")) resource = "/index.html";
         Path path = Paths.get("../public" + resource);
@@ -260,14 +255,10 @@ public class RequestHandler extends Thread {
         
         // Displaying requested resources
         System.out.println("PUT " + resource);
-        if(resource.equals("/")) {
-            System.out.println("Empty resource, writing in out.txt");
-            resource = "/out.txt";
-        } 
+        if(resource.equals("/")) {  resource = "/out.txt";} 
          
         char c; 
         String bodyLine = ""; 
-        System.out.println("Content length : " +length);
         for (int i=0; i < length ;i++) {
             c = (char) in.read();
             bodyLine = bodyLine + c;        
@@ -301,10 +292,7 @@ public class RequestHandler extends Thread {
         fOut.flush();
      
         // Sending header 
-        out.println("HTTP/1.0 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        out.println("");
+        out.println(getHeader(200, "text/html"));
     }
 
     /**
