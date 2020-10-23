@@ -192,14 +192,9 @@ public class RequestHandler extends Thread {
         String type = Files.probeContentType(path);
         if (type == null) type = "text/html";
         
-        os.write("HTTP/1.0 200 OK\n".getBytes());
-        os.write(("Content-Type: text/html" + "\n").getBytes());
-        os.write("Server: Bot\n".getBytes());
-        os.write("\n".getBytes());
-        
+        os.write(getHeader(200, type).getBytes());
         
         // Body
-
         // Fetch file type
         BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
         int size;
@@ -364,24 +359,15 @@ public class RequestHandler extends Thread {
                     DELETEHandler(parameters.get("resource"), output);
                     break;
                 default:
-                    output.println("HTTP/1.0 400 Bad Request");
-                    output.println("Content-Type: text/html");
-                    output.println("Server: Bot");
-                    output.println("");
+                    output.println(getHeader(400, "text/html"));
                     output.println("<p>Bad request (400)</p>");
             }
         } catch (FileNotFoundException e) {
-            output.println("HTTP/1.0 404 Not Found");
-            output.println("Content-Type: text/html");
-            output.println("Server: Bot");
-            output.println("");
+            output.println(getHeader(404, "text/html"));
             output.println("<p>Not found (404)</p>");
         } catch (Exception e) {
             e.printStackTrace();
-            output.println("HTTP/1.0 500 Internal Server Error");
-            output.println("Content-Type: text/html");
-            output.println("Server: Bot");
-            output.println("");
+            output.println(getHeader(500, "text/html"));
             output.println("<p>Internal Server Error (500)</p>");
         }
 
