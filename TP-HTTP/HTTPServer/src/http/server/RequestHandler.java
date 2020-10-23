@@ -76,7 +76,7 @@ public class RequestHandler extends Thread {
         if (str != null && !str.equals("")) {
             // First line
             String[] args = str.split("\\s");
-            if (args.length >= 2) {
+            if (args.length == 3) {
                 parameters.put("method", args[0]);
                 parameters.put("resource", args[1]);
                 parameters.put("version", args[2]);
