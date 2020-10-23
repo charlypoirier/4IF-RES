@@ -73,7 +73,7 @@ public class ChatServer  {
             ServerSocket serverSocket = new ServerSocket(port);
             
             // Display message saying that we are waiting
-            display("Server ready on port : "+ port + "." +keepGoing);
+            display("Server ready on port : "+ port + ".");
             
             while(keepGoing) {
                 // Server waits for a connection
