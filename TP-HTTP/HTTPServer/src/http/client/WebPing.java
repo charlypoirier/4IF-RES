@@ -5,14 +5,14 @@ import java.net.Socket;
 
 /**
  * WebPing class
+ * 
+ * This is an example that simply connects
+ * to an HTTP server
  */
 public class WebPing {
 
     /**
      * Main method
-     * 
-     * This is an example that simply connects
-     * to an HTTP server
      * 
      * @param args command line arguments [server_hostname, port]
      */
