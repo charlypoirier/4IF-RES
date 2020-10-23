@@ -36,6 +36,11 @@ public class RequestHandler extends Thread {
     /**
      * Parse header parameters and return
      * a Map of keys and values.
+     * 
+     * @throws FileNotFoundException Thrown when a resource is not found
+     * @throws IOException Thrown on input/output errors
+     * 
+     * @return a map of header parameters
      */
     protected Map<String, String> parseParameters() throws FileNotFoundException, IOException {
         Map<String, String> parameters = new HashMap<String, String>();
